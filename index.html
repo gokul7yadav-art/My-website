@@ -1,150 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
-:root {
-  --bg1: #000;
-  --bg2: #001f3f;
-  --card: #1e2a38;
-  --accent: #4cc9f0;
-}
-
 body {
-  margin: 0;
-  font-family: system-ui, Arial;
-  background: linear-gradient(to bottom, var(--bg1), var(--bg2));
-  color: white;
+  margin:0;
+  font-family: Arial;
+  background: linear-gradient(to bottom,#000,#001f3f);
+  color:white;
 }
 
-/* HEADER */
 .header {
-  text-align: center;
-  padding: 16px;
-  font-size: 22px;
-  font-weight: 600;
+  text-align:center;
+  padding:15px;
+  font-size:22px;
 }
 
-/* PAGE */
-.page {
-  min-height: 100vh;
-  padding-bottom: 90px;
-  display: none;
-}
-
-#home { display: block; }
+/* PAGES */
+.page { display:none; padding-bottom:90px; }
+#home { display:block; }
 
 /* SEARCH */
 .search-bar {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
+  display:flex;
+  gap:10px;
+  padding:10px;
 }
-
 input, select {
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  width: 100%;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  width:100%;
 }
-
 button {
-  padding: 12px 18px;
-  border-radius: 25px;
-  border: none;
-  background: var(--accent);
-  font-weight: bold;
-}
-
-/* TRENDING */
-.trending {
-  padding: 10px;
-  font-size: 14px;
-}
-
-.trending span {
-  margin-right: 10px;
-  color: var(--accent);
-  cursor: pointer;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  background:#4cc9f0;
 }
 
 /* GRID */
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  padding: 15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
 }
 
-/* CARD */
 .card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-  transition: 0.2s;
-}
-
-.card:active {
-  transform: scale(0.95);
+  background:#1e2a38;
+  border-radius:15px;
+  padding:10px;
+  text-align:center;
 }
 
 .card img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
+  width:100%;
+  height:120px;
+  object-fit:contain;
 }
 
-.star {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 18px;
-}
-
-/* NAVBAR */
+/* NAV */
 .navbar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #000;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  z-index: 1000;
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#000;
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
 }
 
-.nav-item {
-  color: gray;
-  text-align: center;
-  cursor: pointer;
-}
+.nav-item { color:gray; }
+.nav-item.active { color:#4cc9f0; }
 
-.nav-item.active {
-  color: var(--accent);
-}
-
-/* TOAST */
-.toast {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111;
-  padding: 10px 16px;
-  border-radius: 10px;
-  opacity: 0;
-  transition: 0.3s;
-}
-
-.toast.show {
-  opacity: 1;
+.price {
+  color:#4cc9f0;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -155,169 +89,110 @@ button {
 
 <!-- HOME -->
 <div id="home" class="page">
-<div class="search-bar">
-  <input id="search" placeholder="Search products...">
-  <select id="platform">
-    <option value="amazon">Amazon</option>
-    <option value="flipkart">Flipkart</option>
-    <option value="myntra">Myntra</option>
-    <option value="ajio">Ajio</option>
-    <option value="tatacliq">TataCliq</option>
-    <option value="nykaa">Nykaa</option>
-  </select>
-  <button onclick="search()">Go</button>
+  <div class="search-bar">
+    <input id="search" placeholder="Search products">
+    <button onclick="searchProducts()">Search</button>
+  </div>
+
+  <div id="results" class="grid"></div>
 </div>
 
-<div class="trending">
-🔥 Trending:
-<span onclick="quick('shoes')">Shoes</span>
-<span onclick="quick('mobiles')">Mobiles</span>
-<span onclick="quick('watches')">Watches</span>
-</div>
-
-<div id="apps" class="grid"></div>
+<!-- COMPARE -->
+<div id="compare" class="page">
+  <h3 style="padding:10px">💰 Price Comparison</h3>
+  <div id="compareList" class="grid"></div>
 </div>
 
 <!-- FAVORITES -->
 <div id="favPage" class="page">
-<h2 style="padding:10px">⭐ Favorites</h2>
-<div id="fav" class="grid"></div>
+  <h3 style="padding:10px">⭐ Favorites</h3>
+  <div id="fav" class="grid"></div>
 </div>
 
 <!-- RECENT -->
 <div id="recentPage" class="page">
-<h2 style="padding:10px">🕒 Recently Visited</h2>
-<div id="recent" class="grid"></div>
+  <h3 style="padding:10px">🕒 Recent</h3>
+  <div id="recent" class="grid"></div>
 </div>
 
 <!-- NAV -->
 <div class="navbar">
-  <div class="nav-item active" onclick="showPage('home', this)">🏠<br>Home</div>
-  <div class="nav-item" onclick="showPage('favPage', this)">⭐<br>Fav</div>
-  <div class="nav-item" onclick="showPage('recentPage', this)">🕒<br>Recent</div>
+  <div class="nav-item active" onclick="showPage('home',this)">🏠</div>
+  <div class="nav-item" onclick="showPage('compare',this)">💰</div>
+  <div class="nav-item" onclick="showPage('favPage',this)">⭐</div>
+  <div class="nav-item" onclick="showPage('recentPage',this)">🕒</div>
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
-/* SERVICE WORKER */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+let fav = JSON.parse(localStorage.getItem("fav")) || [];
+let recent = JSON.parse(localStorage.getItem("recent")) || [];
+let products = [];
 
-/* DATA */
-const APPS = {
-  amazon: "https://www.amazon.in/s?k=",
-  flipkart: "https://www.flipkart.com/search?q=",
-  myntra: "https://www.myntra.com/",
-  ajio: "https://www.ajio.com/search/?text=",
-  tatacliq: "https://www.tatacliq.com/search/?text=",
-  nykaa: "https://www.nykaa.com/search/result/?q="
-};
-
-let state = {
-  fav: JSON.parse(localStorage.getItem("fav")) || [],
-  recent: JSON.parse(localStorage.getItem("recent")) || []
-};
-
-/* UTIL */
-function save() {
-  localStorage.setItem("fav", JSON.stringify(state.fav));
-  localStorage.setItem("recent", JSON.stringify(state.recent));
-}
-
-function toast(msg) {
-  const t = document.getElementById("toast");
-  t.innerText = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
-}
-
-/* SEARCH */
-function search() {
-  const q = document.getElementById("search").value.trim();
-  const p = document.getElementById("platform").value;
+/* SEARCH PRODUCTS */
+async function searchProducts() {
+  const q = document.getElementById("search").value;
   if (!q) return;
 
-  addRecent(p);
-  window.open(APPS[p] + q, "_blank");
+  const res = await fetch("https://dummyjson.com/products/search?q=" + q);
+  const data = await res.json();
+
+  products = data.products;
+
+  renderProducts();
+  renderCompare();
 }
 
-/* QUICK */
-function quick(q) {
-  document.getElementById("search").value = q;
+/* PRODUCT CARDS */
+function renderProducts() {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+
+  products.forEach(p => {
+    container.innerHTML += `
+      <div class="card" onclick="openProduct('${p.title}')">
+        <img src="${p.thumbnail}">
+        <p>${p.title}</p>
+        <div class="price">₹${p.price}</div>
+      </div>
+    `;
+  });
 }
 
-/* FAVORITE */
-function toggleFav(app, e) {
-  e.stopPropagation();
+/* COMPARE VIEW */
+function renderCompare() {
+  const c = document.getElementById("compareList");
+  c.innerHTML = "";
 
-  if (state.fav.includes(app)) {
-    state.fav = state.fav.filter(a => a !== app);
-    toast("Removed from favorites");
-  } else {
-    state.fav.push(app);
-    toast("Added to favorites");
-  }
+  products.forEach(p => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="${p.thumbnail}">
+        <p>${p.title}</p>
 
-  save();
-  render();
+        <div class="price">Amazon: ₹${p.price}</div>
+        <div class="price">Flipkart: ₹${p.price + 100}</div>
+        <div class="price">Myntra: ₹${p.price + 200}</div>
+      </div>
+    `;
+  });
 }
 
-/* RECENT */
-function addRecent(app) {
-  state.recent = [app, ...state.recent.filter(a => a !== app)].slice(0,5);
-  save();
+/* OPEN PRODUCT */
+function openProduct(name) {
+  window.open("https://www.google.com/search?q=" + name, "_blank");
+
+  recent.unshift(name);
+  localStorage.setItem("recent", JSON.stringify(recent.slice(0,5)));
 }
 
-/* CARD */
-function createCard(app) {
-  const div = document.createElement("div");
-  div.className = "card";
-
-  div.innerHTML = `
-    <div class="star">${state.fav.includes(app) ? "⭐" : "☆"}</div>
-    <img src="${app}.png" onerror="this.src='https://via.placeholder.com/70?text=${app}'">
-    <p>${app.charAt(0).toUpperCase() + app.slice(1)}</p>
-  `;
-
-  div.onclick = () => {
-    addRecent(app);
-    window.open(APPS[app], "_blank");
-    render();
-  };
-
-  div.querySelector(".star").onclick = (e) => toggleFav(app, e);
-
-  return div;
-}
-
-/* RENDER */
-function render() {
-  const appsEl = document.getElementById("apps");
-  const favEl = document.getElementById("fav");
-  const recentEl = document.getElementById("recent");
-
-  appsEl.innerHTML = "";
-  favEl.innerHTML = "";
-  recentEl.innerHTML = "";
-
-  Object.keys(APPS).forEach(a => appsEl.appendChild(createCard(a)));
-  state.fav.forEach(a => favEl.appendChild(createCard(a)));
-  state.recent.forEach(a => recentEl.appendChild(createCard(a)));
-}
-
-/* NAV */
+/* NAVIGATION */
 function showPage(id, el) {
-  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-  document.getElementById(id).style.display = "block";
+  document.querySelectorAll(".page").forEach(p => p.style.display="none");
+  document.getElementById(id).style.display="block";
 
-  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   el.classList.add("active");
 }
-
-/* INIT */
-render();
 </script>
 
 </body>
