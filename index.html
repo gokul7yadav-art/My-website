@@ -1,98 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 body {
-  margin:0;
+  margin: 0;
   font-family: Arial;
-  background: linear-gradient(to bottom,#000,#001f3f);
-  color:white;
+  background: linear-gradient(to bottom, #000, #001f3f);
+  color: white;
 }
 
-/* HEADER */
+/* Header */
 .header {
-  text-align:center;
-  padding:15px;
-  font-size:22px;
+  text-align: center;
+  padding: 15px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* SEARCH */
+/* Pages */
+.page {
+  min-height: 100vh;
+  padding-bottom: 90px; /* prevents navbar overlap */
+  display: none;
+}
+
+#home {
+  display: block;
+}
+
+/* Search */
 .search-bar {
-  display:flex;
-  gap:10px;
-  padding:10px;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
 }
-input {
-  flex:1;
-  padding:12px;
-  border-radius:20px;
-  border:none;
+
+input, select {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  width: 100%;
 }
+
 button {
-  padding:12px;
-  border-radius:20px;
-  border:none;
-  background:#4cc9f0;
+  padding: 12px 18px;
+  border-radius: 25px;
+  border: none;
+  background: #4cc9f0;
+  font-weight: bold;
 }
 
-/* GRID */
+/* Trending */
+.trending {
+  padding: 10px;
+}
+
+.trending span {
+  margin-right: 10px;
+  color: #4cc9f0;
+  cursor: pointer;
+}
+
+/* Grid */
 .grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
 }
 
-/* CARD */
+/* Cards */
 .card {
-  background:#1e2a38;
-  border-radius:15px;
-  padding:15px;
-  text-align:center;
-  position:relative;
+  background: #1e2a38;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  transition: 0.2s;
+}
+
+.card:active {
+  transform: scale(0.95);
 }
 
 .card img {
-  width:100%;
-  height:100px;
-  object-fit:contain;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
 }
 
-/* STAR */
 .star {
-  position:absolute;
-  top:10px;
-  right:10px;
-  font-size:20px;
-  cursor:pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
 }
 
-/* PAGES */
-.page {
-  display:none;
-  padding-bottom:80px;
-}
-#home { display:block; }
-
-/* NAVBAR */
+/* Navbar */
 .navbar {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#000;
-  display:flex;
-  justify-content:space-around;
-  padding:10px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: black;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  z-index: 1000;
 }
 
 .nav-item {
-  color:gray;
+  text-align: center;
+  color: gray;
+  cursor: pointer;
 }
+
 .nav-item.active {
-  color:#4cc9f0;
+  color: #4cc9f0;
 }
 </style>
 </head>
@@ -104,163 +134,140 @@ button {
 <!-- HOME -->
 <div id="home" class="page">
 
-  <div class="search-bar">
-    <input id="search" placeholder="Search products">
-    <button onclick="search()">Search</button>
-  </div>
+<div class="search-bar">
+  <input id="search" placeholder="Search products...">
+  <select id="platform">
+    <option value="amazon">Amazon</option>
+    <option value="flipkart">Flipkart</option>
+    <option value="myntra">Myntra</option>
+    <option value="ajio">Ajio</option>
+    <option value="tatacliq">TataCliq</option>
+    <option value="nykaa">Nykaa</option>
+  </select>
+  <button onclick="search()">Go</button>
+</div>
 
-  <!-- RESULTS -->
-  <div id="results" class="grid"></div>
+<div class="trending">
+🔥 Trending:
+<span onclick="quick('shoes')">Shoes</span>
+<span onclick="quick('mobiles')">Mobiles</span>
+<span onclick="quick('watches')">Watches</span>
+<span onclick="quick('headphones')">Headphones</span>
+</div>
 
-  <!-- APPS -->
-  <h3 style="padding-left:10px">🛍️ All Apps</h3>
-  <div class="grid" id="apps"></div>
+<div id="apps" class="grid"></div>
 
 </div>
 
 <!-- FAVORITES -->
 <div id="favPage" class="page">
-  <h3 style="padding:10px">⭐ Favorites</h3>
-  <div id="fav" class="grid"></div>
+<h2 style="padding:10px">⭐ Favorites</h2>
+<div id="fav" class="grid"></div>
 </div>
 
 <!-- RECENT -->
 <div id="recentPage" class="page">
-  <h3 style="padding:10px">🕒 Recently Visited</h3>
-  <div id="recent" class="grid"></div>
+<h2 style="padding:10px">🕒 Recently Visited</h2>
+<div id="recent" class="grid"></div>
 </div>
 
 <!-- NAVBAR -->
 <div class="navbar">
-  <div class="nav-item active" onclick="showPage('home',this)">🏠</div>
-  <div class="nav-item" onclick="showPage('favPage',this)">⭐</div>
-  <div class="nav-item" onclick="showPage('recentPage',this)">🕒</div>
+  <div class="nav-item active" onclick="showPage('home', this)">🏠<br>Home</div>
+  <div class="nav-item" onclick="showPage('favPage', this)">⭐<br>Fav</div>
+  <div class="nav-item" onclick="showPage('recentPage', this)">🕒<br>Recent</div>
 </div>
 
 <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
 
-/* DATA */
-const apps = [
-  {name:"Amazon", img:"amazon.png", url:"https://www.amazon.in/s?k="},
-  {name:"Flipkart", img:"flipkart.png", url:"https://www.flipkart.com/search?q="},
-  {name:"Myntra", img:"myntra.png", url:"https://www.myntra.com/"},
-  {name:"Ajio", img:"ajio.png", url:"https://www.ajio.com/search/?text="},
-  {name:"TataCliq", img:"tatacliq.png", url:"https://www.tatacliq.com/search/?searchCategory=all&text="},
-  {name:"Nykaa", img:"nykaa.png", url:"https://www.nykaa.com/search/result/?q="}
-];
+const apps = {
+  amazon: "https://www.amazon.in/s?k=",
+  flipkart: "https://www.flipkart.com/search?q=",
+  myntra: "https://www.myntra.com/",
+  ajio: "https://www.ajio.com/search/?text=",
+  tatacliq: "https://www.tatacliq.com/search/?text=",
+  nykaa: "https://www.nykaa.com/search/result/?q="
+};
 
 let fav = JSON.parse(localStorage.getItem("fav")) || [];
 let recent = JSON.parse(localStorage.getItem("recent")) || [];
 
-/* LOAD APPS */
-function loadApps() {
-  const container = document.getElementById("apps");
-  container.innerHTML = "";
+function search() {
+  let q = document.getElementById("search").value;
+  let p = document.getElementById("platform").value;
 
-  apps.forEach(app => {
-    const isFav = fav.includes(app.name);
-
-    container.innerHTML += `
-      <div class="card">
-        <div class="star" onclick="toggleFav('${app.name}')">
-          ${isFav ? "⭐" : "☆"}
-        </div>
-        <img src="${app.img}">
-        <p>${app.name}</p>
-        <button onclick="openApp('${app.name}')">Open</button>
-      </div>
-    `;
-  });
+  addRecent(p);
+  window.open(apps[p] + q, "_blank");
 }
 
-/* FAVORITES */
-function toggleFav(name) {
-  if (fav.includes(name)) {
-    fav = fav.filter(f => f !== name);
+function quick(q) {
+  document.getElementById("search").value = q;
+}
+
+function toggleFav(app, e) {
+  e.stopPropagation();
+
+  if (fav.includes(app)) {
+    fav = fav.filter(a => a !== app);
   } else {
-    fav.push(name);
+    fav.push(app);
   }
+
   localStorage.setItem("fav", JSON.stringify(fav));
-  loadApps();
-  loadFav();
+  render();
 }
 
-function loadFav() {
-  const container = document.getElementById("fav");
-  container.innerHTML = "";
-
-  apps.filter(a => fav.includes(a.name)).forEach(app => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${app.img}">
-        <p>${app.name}</p>
-      </div>
-    `;
-  });
+function addRecent(app) {
+  recent = [app, ...recent.filter(a => a !== app)].slice(0,5);
+  localStorage.setItem("recent", JSON.stringify(recent));
 }
 
-/* RECENT */
-function openApp(name) {
-  const app = apps.find(a => a.name === name);
-  const q = document.getElementById("search").value;
+function createCard(app) {
+  let div = document.createElement("div");
+  div.className = "card";
 
-  window.open(app.url + q, "_blank");
+  div.innerHTML = `
+    <div class="star">${fav.includes(app) ? "⭐" : "☆"}</div>
+    <img src="${app}.png" onerror="this.src='https://via.placeholder.com/70?text=${app}'">
+    <p>${app.charAt(0).toUpperCase() + app.slice(1)}</p>
+  `;
 
-  recent.unshift(name);
-  localStorage.setItem("recent", JSON.stringify(recent.slice(0,5)));
-  loadRecent();
+  div.onclick = () => {
+    addRecent(app);
+    window.open(apps[app], "_blank");
+    render();
+  };
+
+  div.querySelector(".star").onclick = (e) => toggleFav(app, e);
+
+  return div;
 }
 
-function loadRecent() {
-  const container = document.getElementById("recent");
-  container.innerHTML = "";
+function render() {
+  document.getElementById("apps").innerHTML = "";
+  document.getElementById("fav").innerHTML = "";
+  document.getElementById("recent").innerHTML = "";
 
-  apps.filter(a => recent.includes(a.name)).forEach(app => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${app.img}">
-        <p>${app.name}</p>
-      </div>
-    `;
-  });
+  for (let app in apps) {
+    document.getElementById("apps").appendChild(createCard(app));
+  }
+
+  fav.forEach(a => document.getElementById("fav").appendChild(createCard(a)));
+  recent.forEach(a => document.getElementById("recent").appendChild(createCard(a)));
 }
 
-/* SEARCH PRODUCTS (API) */
-async function search() {
-  const q = document.getElementById("search").value;
-  if (!q) return;
+function showPage(page, el) {
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  document.getElementById(page).style.display = "block";
 
-  const res = await fetch("https://dummyjson.com/products/search?q=" + q);
-  const data = await res.json();
-
-  const container = document.getElementById("results");
-  container.innerHTML = "";
-
-  data.products.forEach(p => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${p.thumbnail}">
-        <p>${p.title}</p>
-        <p>₹${p.price}</p>
-      </div>
-    `;
-  });
-}
-
-/* NAVIGATION */
-function showPage(id, el) {
-  document.querySelectorAll(".page").forEach(p => p.style.display="none");
-  document.getElementById(id).style.display="block";
-
-  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
   el.classList.add("active");
 }
 
-/* INIT */
-loadApps();
-loadFav();
-loadRecent();
-
+render();
 </script>
 
 </body>
