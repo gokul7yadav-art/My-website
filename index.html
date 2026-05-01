@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 body {
   margin: 0;
@@ -46,13 +48,12 @@ button {
 /* Trending */
 .trending {
   padding: 10px;
-  font-size: 14px;
 }
 
 .trending span {
   margin-right: 10px;
-  cursor: pointer;
   color: #4cc9f0;
+  cursor: pointer;
 }
 
 /* Grid */
@@ -63,21 +64,24 @@ button {
   padding: 15px;
 }
 
-/* Cards */
+/* Card */
 .card {
   background: #1e2a38;
   border-radius: 15px;
   padding: 20px;
   text-align: center;
   position: relative;
-  cursor: pointer;
+  transition: 0.2s;
+}
+
+.card:active {
+  transform: scale(0.95);
 }
 
 .card img {
   width: 70px;
   height: 70px;
   object-fit: contain;
-  margin-bottom: 10px;
 }
 
 .star {
@@ -100,12 +104,23 @@ button {
 
 .nav-item {
   text-align: center;
-  cursor: pointer;
   color: gray;
+  cursor: pointer;
 }
 
 .nav-item.active {
   color: #4cc9f0;
+}
+
+/* Page animation */
+.page {
+  display: none;
+  animation: fade 0.2s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
 </head>
@@ -114,7 +129,8 @@ button {
 
 <div class="header">🛒 Shopping Hub</div>
 
-<div id="home">
+<!-- HOME -->
+<div id="home" class="page" style="display:block">
 
 <div class="search-bar">
   <input id="search" placeholder="Search products...">
@@ -141,17 +157,19 @@ button {
 
 </div>
 
-<div id="favPage" style="display:none">
-  <h2 style="padding:10px">⭐ Favorites</h2>
-  <div id="fav" class="grid"></div>
+<!-- FAVORITES -->
+<div id="favPage" class="page">
+<h2 style="padding:10px">⭐ Favorites</h2>
+<div id="fav" class="grid"></div>
 </div>
 
-<div id="recentPage" style="display:none">
-  <h2 style="padding:10px">🕒 Recently Visited</h2>
-  <div id="recent" class="grid"></div>
+<!-- RECENT -->
+<div id="recentPage" class="page">
+<h2 style="padding:10px">🕒 Recently Visited</h2>
+<div id="recent" class="grid"></div>
 </div>
 
-<!-- Bottom Nav -->
+<!-- NAV -->
 <div class="navbar">
   <div class="nav-item active" onclick="showPage('home', this)">🏠<br>Home</div>
   <div class="nav-item" onclick="showPage('favPage', this)">⭐<br>Fav</div>
@@ -159,6 +177,10 @@ button {
 </div>
 
 <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+
 const apps = {
   amazon: "https://www.amazon.in/s?k=",
   flipkart: "https://www.flipkart.com/search?q=",
@@ -174,6 +196,7 @@ let recent = JSON.parse(localStorage.getItem("recent")) || [];
 function search() {
   let q = document.getElementById("search").value;
   let p = document.getElementById("platform").value;
+
   addRecent(p);
   window.open(apps[p] + q, "_blank");
 }
@@ -206,9 +229,8 @@ function createCard(app) {
 
   div.innerHTML = `
     <div class="star">${fav.includes(app) ? "⭐" : "☆"}</div>
-    <img src="${app}.png"
-         onerror="this.src='https://via.placeholder.com/70?text=${app}'">
-    <p>${app.charAt(0).toUpperCase() + app.slice(1)}</p>
+    <img src="${app}.png" onerror="this.src='https://via.placeholder.com/70?text=${app}'">
+    <p>${app}</p>
   `;
 
   div.onclick = () => {
@@ -231,20 +253,12 @@ function render() {
     document.getElementById("apps").appendChild(createCard(app));
   }
 
-  fav.forEach(a => {
-    document.getElementById("fav").appendChild(createCard(a));
-  });
-
-  recent.forEach(a => {
-    document.getElementById("recent").appendChild(createCard(a));
-  });
+  fav.forEach(a => document.getElementById("fav").appendChild(createCard(a)));
+  recent.forEach(a => document.getElementById("recent").appendChild(createCard(a)));
 }
 
 function showPage(page, el) {
-  document.getElementById("home").style.display = "none";
-  document.getElementById("favPage").style.display = "none";
-  document.getElementById("recentPage").style.display = "none";
-
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
   document.getElementById(page).style.display = "block";
 
   document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
