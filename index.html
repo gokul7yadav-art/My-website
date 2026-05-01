@@ -25,27 +25,34 @@
       display: flex;
       justify-content: center;
       margin: 20px;
+      gap: 5px;
     }
 
     input {
-      width: 70%;
+      width: 50%;
       padding: 12px;
-      border-radius: 25px 0 0 25px;
+      border-radius: 25px;
       border: none;
       outline: none;
     }
 
+    select {
+      padding: 12px;
+      border-radius: 25px;
+      border: none;
+    }
+
     button {
-      padding: 12px 20px;
+      padding: 12px 15px;
       border: none;
       background: #38bdf8;
       color: black;
       font-weight: bold;
-      border-radius: 0 25px 25px 0;
+      border-radius: 25px;
       cursor: pointer;
     }
 
-    /* CATEGORY TABS */
+    /* TABS */
     .tabs {
       display: flex;
       justify-content: center;
@@ -72,6 +79,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 15px;
       padding: 20px;
+      padding-bottom: 80px;
     }
 
     .card {
@@ -82,15 +90,37 @@
       color: white;
       text-align: center;
       transition: 0.3s;
-      backdrop-filter: blur(10px);
     }
 
     .card:hover {
-      transform: scale(1.07);
+      transform: scale(1.05);
       box-shadow: 0 0 15px #38bdf8;
     }
 
     .hidden { display: none; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #020617;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #1e293b;
+    }
+
+    .bottom-nav div {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .bottom-nav div.active {
+      color: #38bdf8;
+    }
   </style>
 </head>
 
@@ -101,7 +131,13 @@
 <!-- SEARCH -->
 <div class="search-box">
   <input type="text" id="searchInput" placeholder="Search products...">
-  <button onclick="search()">Search</button>
+
+  <select id="platform">
+    <option value="amazon">Amazon</option>
+    <option value="flipkart">Flipkart</option>
+  </select>
+
+  <button onclick="search()">Go</button>
 </div>
 
 <!-- TABS -->
@@ -115,25 +151,35 @@
 <!-- GRID -->
 <div class="grid">
 
-  <!-- ELECTRONICS -->
   <a class="card all electronics" href="https://www.amazon.in" target="_blank">Amazon</a>
   <a class="card all electronics" href="https://www.flipkart.com" target="_blank">Flipkart</a>
 
-  <!-- FASHION -->
   <a class="card all fashion" href="https://www.myntra.com" target="_blank">Myntra</a>
   <a class="card all fashion" href="https://www.ajio.com" target="_blank">Ajio</a>
   <a class="card all fashion" href="https://www.tatacliq.com" target="_blank">Tata Cliq</a>
 
-  <!-- BEAUTY -->
   <a class="card all beauty" href="https://www.nykaa.com" target="_blank">Nykaa</a>
 
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="active">🏠 Home</div>
+  <div onclick="scrollToTop()">🔍 Search</div>
+  <div onclick="scrollToTop()">🛍 Categories</div>
 </div>
 
 <script>
 function search() {
   let q = document.getElementById("searchInput").value;
-  if(q.trim() !== "") {
+  let platform = document.getElementById("platform").value;
+
+  if(q.trim() === "") return;
+
+  if(platform === "amazon") {
     window.open("https://www.amazon.in/s?k=" + q, "_blank");
+  } else {
+    window.open("https://www.flipkart.com/search?q=" + q, "_blank");
   }
 }
 
@@ -148,6 +194,10 @@ function showCategory(category, el) {
       card.classList.add('hidden');
     }
   });
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 
