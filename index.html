@@ -112,6 +112,7 @@ body{
   max-width:90px;
   max-height:45px;
   object-fit:contain;
+  filter:brightness(1.2);
 }
 
 /* RIPPLE */
@@ -169,14 +170,14 @@ const links = {
   Nykaa:"https://www.nykaa.com/"
 };
 
-/* ✅ STABLE LOGOS */
+/* ✅ WORKING LOGOS */
 const logos = {
-  Amazon:"https://logo.clearbit.com/amazon.in",
-  Flipkart:"https://logo.clearbit.com/flipkart.com",
-  Myntra:"https://logo.clearbit.com/myntra.com",
-  Ajio:"https://logo.clearbit.com/ajio.com",
-  "Tata Cliq":"https://logo.clearbit.com/tatacliq.com",
-  Nykaa:"https://logo.clearbit.com/nykaa.com"
+  Amazon:"https://cdn.worldvectorlogo.com/logos/amazon-dark.svg",
+  Flipkart:"https://cdn.worldvectorlogo.com/logos/flipkart.svg",
+  Myntra:"https://cdn.worldvectorlogo.com/logos/myntra-1.svg",
+  Ajio:"https://cdn.worldvectorlogo.com/logos/ajio-1.svg",
+  "Tata Cliq":"https://cdn.worldvectorlogo.com/logos/tata-cliq.svg",
+  Nykaa:"https://cdn.worldvectorlogo.com/logos/nykaa-1.svg"
 };
 
 function updateDropdown(category){
@@ -202,7 +203,7 @@ function updateGrid(category){
     img.src=logos[p];
     img.alt=p;
 
-    /* fallback if image fails */
+    /* fallback */
     img.onerror=()=>{
       img.remove();
       const text=document.createElement("span");
