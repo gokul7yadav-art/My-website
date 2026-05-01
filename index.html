@@ -23,40 +23,60 @@ body{
 .header{
   padding:16px;
   text-align:center;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.6);
   backdrop-filter:blur(10px);
 }
-.header h1{ margin:0; color:var(--accent); letter-spacing:.3px; }
+.header h1{
+  margin:0;
+  color:var(--accent);
+}
 
 /* SEARCH */
 .search-box{
-  display:flex; gap:8px; padding:14px;
+  display:flex;
+  gap:8px;
+  padding:14px;
 }
 .search-box input{
-  flex:1; min-width:0;
-  padding:12px 14px; border-radius:999px; border:none;
+  flex:1;
+  min-width:0;
+  padding:12px;
+  border-radius:999px;
+  border:none;
   outline:none;
 }
 .search-box select{
-  padding:12px; border-radius:999px; border:none; max-width:110px;
+  padding:12px;
+  border-radius:999px;
+  border:none;
+  max-width:110px;
 }
 .search-box button{
-  padding:12px 14px; border-radius:999px; border:none;
-  background:var(--accent); color:#001018; font-weight:700;
+  padding:12px 14px;
+  border-radius:999px;
+  border:none;
+  background:var(--accent);
+  font-weight:700;
 }
 
 /* CATEGORY */
 .categories{
-  display:flex; flex-wrap:wrap; justify-content:center;
-  gap:10px; padding:8px 12px 4px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  padding:6px 10px;
 }
 .categories button{
-  padding:8px 16px; border-radius:999px; border:none;
-  background:#1b2736; color:#cfe6ff;
-  transition:.25s;
+  padding:8px 14px;
+  border-radius:999px;
+  border:none;
+  background:#1b2736;
+  color:#cfe6ff;
 }
 .categories button.active{
-  background:var(--accent); color:#001018;
+  background:var(--accent);
+  color:#001018;
 }
 
 /* GRID */
@@ -64,44 +84,49 @@ body{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:14px;
-  padding:16px 16px 28px;
+  padding:16px;
 }
 
 /* CARD */
 .card{
   position:relative;
-  padding:18px;
+  height:110px;
   border-radius:18px;
   background:rgba(255,255,255,.06);
-  backdrop-filter:blur(14px);
-  display:flex; align-items:center; justify-content:center;
-  height:110px;
+  backdrop-filter:blur(12px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
   overflow:hidden;
-  transition:transform .18s ease, background .18s ease;
+  transition:.2s;
 }
-.card:active{ transform:scale(.96); }
-.card:hover{ transform:translateY(-3px); background:rgba(79,209,255,.18); }
+.card:active{
+  transform:scale(.95);
+}
+.card:hover{
+  background:rgba(79,209,255,.18);
+}
 
 /* LOGO */
 .card img{
-  max-width:90px; max-height:46px; object-fit:contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+  max-width:90px;
+  max-height:45px;
+  object-fit:contain;
 }
 
 /* RIPPLE */
 .ripple{
-  position:absolute; border-radius:50%;
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,.4);
   transform:scale(0);
   animation:ripple .5s linear;
-  background:rgba(255,255,255,.35);
 }
 @keyframes ripple{
-  to{ transform:scale(4); opacity:0; }
-}
-
-/* MOBILE TUNE */
-@media (max-width:480px){
-  .search-box select{ max-width:90px; }
+  to{
+    transform:scale(4);
+    opacity:0;
+  }
 }
 </style>
 </head>
@@ -144,14 +169,14 @@ const links = {
   Nykaa:"https://www.nykaa.com/"
 };
 
-/* 🔥 LOGOS (CDN images) */
+/* ✅ STABLE LOGOS */
 const logos = {
-  Amazon:"https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-  Flipkart:"https://upload.wikimedia.org/wikipedia/commons/1/17/Flipkart_logo.png",
-  Myntra:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Myntra_logo.png",
-  Ajio:"https://upload.wikimedia.org/wikipedia/commons/2/22/Ajio-Logo.png",
-  "Tata Cliq":"https://upload.wikimedia.org/wikipedia/commons/0/0b/Tata_CLiQ_logo.png",
-  Nykaa:"https://upload.wikimedia.org/wikipedia/commons/0/0f/Nykaa_Logo.png"
+  Amazon:"https://logo.clearbit.com/amazon.in",
+  Flipkart:"https://logo.clearbit.com/flipkart.com",
+  Myntra:"https://logo.clearbit.com/myntra.com",
+  Ajio:"https://logo.clearbit.com/ajio.com",
+  "Tata Cliq":"https://logo.clearbit.com/tatacliq.com",
+  Nykaa:"https://logo.clearbit.com/nykaa.com"
 };
 
 function updateDropdown(category){
@@ -159,7 +184,8 @@ function updateDropdown(category){
   d.innerHTML="";
   platforms[category].forEach(p=>{
     let o=document.createElement("option");
-    o.value=p; o.textContent=p;
+    o.value=p;
+    o.textContent=p;
     d.appendChild(o);
   });
 }
@@ -172,14 +198,21 @@ function updateGrid(category){
     const card=document.createElement("div");
     card.className="card";
 
-    /* logo */
     const img=document.createElement("img");
     img.src=logos[p];
     img.alt=p;
 
+    /* fallback if image fails */
+    img.onerror=()=>{
+      img.remove();
+      const text=document.createElement("span");
+      text.textContent=p;
+      text.style.fontWeight="600";
+      card.appendChild(text);
+    };
+
     card.appendChild(img);
 
-    /* click + ripple */
     card.onclick=(e)=>{
       const ripple=document.createElement("span");
       ripple.className="ripple";
@@ -216,7 +249,7 @@ function searchProduct(){
   }
 }
 
-/* init */
+/* INIT */
 updateDropdown("all");
 updateGrid("all");
 </script>
