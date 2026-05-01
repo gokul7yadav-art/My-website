@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial;
+      color: white;
+      background: linear-gradient(135deg,#020617,#0f172a);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #38bdf8;
+    }
+
+    /* SEARCH */
+    .search-box {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+
+    input {
+      width: 70%;
+      padding: 12px;
+      border-radius: 25px 0 0 25px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      background: #38bdf8;
+      color: black;
+      font-weight: bold;
+      border-radius: 0 25px 25px 0;
+      cursor: pointer;
+    }
+
+    /* CATEGORY TABS */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: #1e293b;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #38bdf8;
+      color: black;
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.05);
+      text-decoration: none;
+      color: white;
+      text-align: center;
+      transition: 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .card:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 15px #38bdf8;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+
+<body>
+
+<h1>🛒 Shopping Hub</h1>
+
+<!-- SEARCH -->
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search products...">
+  <button onclick="search()">Search</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showCategory('all',this)">All</div>
+  <div class="tab" onclick="showCategory('fashion',this)">Fashion</div>
+  <div class="tab" onclick="showCategory('electronics',this)">Electronics</div>
+  <div class="tab" onclick="showCategory('beauty',this)">Beauty</div>
+</div>
+
+<!-- GRID -->
+<div class="grid">
+
+  <!-- ELECTRONICS -->
+  <a class="card all electronics" href="https://www.amazon.in" target="_blank">Amazon</a>
+  <a class="card all electronics" href="https://www.flipkart.com" target="_blank">Flipkart</a>
+
+  <!-- FASHION -->
+  <a class="card all fashion" href="https://www.myntra.com" target="_blank">Myntra</a>
+  <a class="card all fashion" href="https://www.ajio.com" target="_blank">Ajio</a>
+  <a class="card all fashion" href="https://www.tatacliq.com" target="_blank">Tata Cliq</a>
+
+  <!-- BEAUTY -->
+  <a class="card all beauty" href="https://www.nykaa.com" target="_blank">Nykaa</a>
+
+</div>
+
+<script>
+function search() {
+  let q = document.getElementById("searchInput").value;
+  if(q.trim() !== "") {
+    window.open("https://www.amazon.in/s?k=" + q, "_blank");
+  }
+}
+
+function showCategory(category, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  document.querySelectorAll('.card').forEach(card => {
+    if(category === 'all' || card.classList.contains(category)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+</script>
+
+</body>
+</html>
