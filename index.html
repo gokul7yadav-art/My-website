@@ -1,235 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Shopping Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopping Hub</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0a1a2f, #000814);
+  color: white;
+  text-align: center;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial;
-      color: white;
-      background: linear-gradient(135deg,#020617,#0f172a);
-    }
+/* Header */
+h1 {
+  color: #4fd1ff;
+  margin-top: 20px;
+}
 
-    h1 {
-      text-align: center;
-      margin-top: 20px;
-      color: #38bdf8;
-    }
+/* Search Bar */
+.search-box {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px;
+}
 
-    /* SEARCH */
-    .search-box {
-      display: flex;
-      justify-content: center;
-      margin: 20px;
-      gap: 5px;
-    }
+input {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  width: 45%;
+}
 
-    input {
-      width: 50%;
-      padding: 12px;
-      border-radius: 25px;
-      border: none;
-      outline: none;
-    }
+select {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+}
 
-    select {
-      padding: 12px;
-      border-radius: 25px;
-      border: none;
-    }
+button {
+  padding: 12px 18px;
+  border-radius: 25px;
+  border: none;
+  background: #4fd1ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    button {
-      padding: 12px 15px;
-      border: none;
-      background: #38bdf8;
-      color: black;
-      font-weight: bold;
-      border-radius: 25px;
-      cursor: pointer;
-    }
+/* Category Buttons */
+.categories {
+  margin: 15px;
+}
 
-    /* TABS */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px;
-      flex-wrap: wrap;
-    }
+.categories button {
+  margin: 5px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  background: #1f2a38;
+  color: white;
+}
 
-    .tab {
-      padding: 8px 15px;
-      border-radius: 20px;
-      background: #1e293b;
-      cursor: pointer;
-    }
+.categories button.active {
+  background: #4fd1ff;
+  color: black;
+}
 
-    .tab.active {
-      background: #38bdf8;
-      color: black;
-    }
+/* Cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
 
-    /* GRID */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      padding: 20px;
-      padding-bottom: 80px;
-    }
+.card {
+  padding: 25px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .card {
-      padding: 20px;
-      border-radius: 15px;
-      background: rgba(255,255,255,0.05);
-      text-decoration: none;
-      color: white;
-      text-align: center;
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #38bdf8;
-    }
-
-    .hidden { display: none; }
-
-    /* BOTTOM NAV */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #020617;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      border-top: 1px solid #1e293b;
-    }
-
-    .bottom-nav div {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .bottom-nav div.active {
-      color: #38bdf8;
-    }
-  </style>
+.card:hover {
+  transform: scale(1.05);
+  background: rgba(79,209,255,0.2);
+}
+</style>
 </head>
 
 <body>
 
 <h1>🛒 Shopping Hub</h1>
 
-<!-- SEARCH -->
 <div class="search-box">
   <input type="text" id="searchInput" placeholder="Search products...">
-
-  <!-- 🔥 dynamic dropdown -->
-  <select id="platform"></select>
-
-  <button onclick="search()">Go</button>
+  <select id="platformSelect"></select>
+  <button onclick="searchProduct()">Go</button>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="showCategory('all',this)">All</div>
-  <div class="tab" onclick="showCategory('fashion',this)">Fashion</div>
-  <div class="tab" onclick="showCategory('electronics',this)">Electronics</div>
-  <div class="tab" onclick="showCategory('beauty',this)">Beauty</div>
+<div class="categories">
+  <button class="active" onclick="setCategory('all', this)">All</button>
+  <button onclick="setCategory('fashion', this)">Fashion</button>
+  <button onclick="setCategory('electronics', this)">Electronics</button>
+  <button onclick="setCategory('beauty', this)">Beauty</button>
 </div>
 
-<!-- GRID -->
-<div class="grid">
-
-  <a class="card all electronics" href="https://www.amazon.in" target="_blank">Amazon</a>
-  <a class="card all electronics" href="https://www.flipkart.com" target="_blank">Flipkart</a>
-
-  <a class="card all fashion" href="https://www.myntra.com" target="_blank">Myntra</a>
-  <a class="card all fashion" href="https://www.ajio.com" target="_blank">Ajio</a>
-  <a class="card all fashion" href="https://www.tatacliq.com" target="_blank">Tata Cliq</a>
-
-  <a class="card all beauty" href="https://www.nykaa.com" target="_blank">Nykaa</a>
-
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="active">🏠 Home</div>
-  <div onclick="scrollToTop()">🔍 Search</div>
-  <div onclick="scrollToTop()">🛍 Categories</div>
-</div>
+<div class="grid" id="storeGrid"></div>
 
 <script>
 const platforms = {
-  all: [
-    {name:"Amazon", url:"https://www.amazon.in/s?k="},
-    {name:"Flipkart", url:"https://www.flipkart.com/search?q="}
-  ],
-  electronics: [
-    {name:"Amazon", url:"https://www.amazon.in/s?k="},
-    {name:"Flipkart", url:"https://www.flipkart.com/search?q="}
-  ],
-  fashion: [
-    {name:"Myntra", url:"https://www.myntra.com/"},
-    {name:"Ajio", url:"https://www.ajio.com/search/?text="},
-    {name:"Tata Cliq", url:"https://www.tatacliq.com/search/?searchCategory=all&text="}
-  ],
-  beauty: [
-    {name:"Nykaa", url:"https://www.nykaa.com/search/result/?q="}
-  ]
+  all: ["Amazon", "Flipkart", "Myntra", "Ajio", "Tata Cliq", "Nykaa"],
+  fashion: ["Myntra", "Ajio", "Tata Cliq"],
+  electronics: ["Amazon", "Flipkart"],
+  beauty: ["Nykaa"]
+};
+
+const links = {
+  Amazon: "https://www.amazon.in/s?k=",
+  Flipkart: "https://www.flipkart.com/search?q=",
+  Myntra: "https://www.myntra.com/",
+  Ajio: "https://www.ajio.com/",
+  "Tata Cliq": "https://www.tatacliq.com/",
+  Nykaa: "https://www.nykaa.com/"
 };
 
 function updateDropdown(category) {
-  const select = document.getElementById("platform");
-  select.innerHTML = "";
+  const dropdown = document.getElementById("platformSelect");
+  dropdown.innerHTML = "";
 
   platforms[category].forEach(p => {
     let option = document.createElement("option");
-    option.value = p.url;
-    option.textContent = p.name;
-    select.appendChild(option);
+    option.value = p;
+    option.textContent = p;
+    dropdown.appendChild(option);
   });
 }
 
-function search() {
-  let q = document.getElementById("searchInput").value;
-  let base = document.getElementById("platform").value;
+function updateGrid(category) {
+  const grid = document.getElementById("storeGrid");
+  grid.innerHTML = "";
 
-  if(q.trim() === "") return;
-
-  window.open(base + q, "_blank");
+  platforms[category].forEach(p => {
+    let div = document.createElement("div");
+    div.className = "card";
+    div.innerText = p;
+    div.onclick = () => window.open(links[p], "_blank");
+    grid.appendChild(div);
+  });
 }
 
-function showCategory(category, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-
-  document.querySelectorAll('.card').forEach(card => {
-    if(category === 'all' || card.classList.contains(category)) {
-      card.classList.remove('hidden');
-    } else {
-      card.classList.add('hidden');
-    }
-  });
+function setCategory(category, btn) {
+  document.querySelectorAll(".categories button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
 
   updateDropdown(category);
+  updateGrid(category);
 }
 
-window.onload = function() {
-  updateDropdown("all");
-};
+function searchProduct() {
+  const query = document.getElementById("searchInput").value;
+  const platform = document.getElementById("platformSelect").value;
 
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (!query) return;
+
+  let url = links[platform];
+
+  if (platform === "Amazon" || platform === "Flipkart") {
+    window.open(url + encodeURIComponent(query), "_blank");
+  } else {
+    window.open(url, "_blank");
+  }
 }
+
+/* Initial load */
+updateDropdown("all");
+updateGrid("all");
 </script>
 
 </body>
