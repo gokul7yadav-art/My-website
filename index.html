@@ -12,15 +12,12 @@ body {
   color:white;
 }
 
+/* HEADER */
 .header {
   text-align:center;
   padding:15px;
   font-size:22px;
 }
-
-/* PAGES */
-.page { display:none; padding-bottom:90px; }
-#home { display:block; }
 
 /* SEARCH */
 .search-bar {
@@ -28,14 +25,14 @@ body {
   gap:10px;
   padding:10px;
 }
-input, select {
-  padding:10px;
+input {
+  flex:1;
+  padding:12px;
   border-radius:20px;
   border:none;
-  width:100%;
 }
 button {
-  padding:10px;
+  padding:12px;
   border-radius:20px;
   border:none;
   background:#4cc9f0;
@@ -45,24 +42,42 @@ button {
 .grid {
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:12px;
   padding:10px;
 }
 
+/* CARD */
 .card {
   background:#1e2a38;
   border-radius:15px;
-  padding:10px;
+  padding:15px;
   text-align:center;
+  position:relative;
 }
 
 .card img {
   width:100%;
-  height:120px;
+  height:100px;
   object-fit:contain;
 }
 
-/* NAV */
+/* STAR */
+.star {
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:20px;
+  cursor:pointer;
+}
+
+/* PAGES */
+.page {
+  display:none;
+  padding-bottom:80px;
+}
+#home { display:block; }
+
+/* NAVBAR */
 .navbar {
   position:fixed;
   bottom:0;
@@ -70,15 +85,14 @@ button {
   background:#000;
   display:flex;
   justify-content:space-around;
-  padding:10px;
+  padding:10px 0;
 }
 
-.nav-item { color:gray; }
-.nav-item.active { color:#4cc9f0; }
-
-.price {
+.nav-item {
+  color:gray;
+}
+.nav-item.active {
   color:#4cc9f0;
-  font-weight:bold;
 }
 </style>
 </head>
@@ -89,18 +103,19 @@ button {
 
 <!-- HOME -->
 <div id="home" class="page">
+
   <div class="search-bar">
     <input id="search" placeholder="Search products">
-    <button onclick="searchProducts()">Search</button>
+    <button onclick="search()">Search</button>
   </div>
 
+  <!-- RESULTS -->
   <div id="results" class="grid"></div>
-</div>
 
-<!-- COMPARE -->
-<div id="compare" class="page">
-  <h3 style="padding:10px">💰 Price Comparison</h3>
-  <div id="compareList" class="grid"></div>
+  <!-- APPS -->
+  <h3 style="padding-left:10px">🛍️ All Apps</h3>
+  <div class="grid" id="apps"></div>
+
 </div>
 
 <!-- FAVORITES -->
@@ -111,78 +126,125 @@ button {
 
 <!-- RECENT -->
 <div id="recentPage" class="page">
-  <h3 style="padding:10px">🕒 Recent</h3>
+  <h3 style="padding:10px">🕒 Recently Visited</h3>
   <div id="recent" class="grid"></div>
 </div>
 
-<!-- NAV -->
+<!-- NAVBAR -->
 <div class="navbar">
   <div class="nav-item active" onclick="showPage('home',this)">🏠</div>
-  <div class="nav-item" onclick="showPage('compare',this)">💰</div>
   <div class="nav-item" onclick="showPage('favPage',this)">⭐</div>
   <div class="nav-item" onclick="showPage('recentPage',this)">🕒</div>
 </div>
 
 <script>
+
+/* DATA */
+const apps = [
+  {name:"Amazon", img:"amazon.png", url:"https://www.amazon.in/s?k="},
+  {name:"Flipkart", img:"flipkart.png", url:"https://www.flipkart.com/search?q="},
+  {name:"Myntra", img:"myntra.png", url:"https://www.myntra.com/"},
+  {name:"Ajio", img:"ajio.png", url:"https://www.ajio.com/search/?text="},
+  {name:"TataCliq", img:"tatacliq.png", url:"https://www.tatacliq.com/search/?searchCategory=all&text="},
+  {name:"Nykaa", img:"nykaa.png", url:"https://www.nykaa.com/search/result/?q="}
+];
+
 let fav = JSON.parse(localStorage.getItem("fav")) || [];
 let recent = JSON.parse(localStorage.getItem("recent")) || [];
-let products = [];
 
-/* SEARCH PRODUCTS */
-async function searchProducts() {
+/* LOAD APPS */
+function loadApps() {
+  const container = document.getElementById("apps");
+  container.innerHTML = "";
+
+  apps.forEach(app => {
+    const isFav = fav.includes(app.name);
+
+    container.innerHTML += `
+      <div class="card">
+        <div class="star" onclick="toggleFav('${app.name}')">
+          ${isFav ? "⭐" : "☆"}
+        </div>
+        <img src="${app.img}">
+        <p>${app.name}</p>
+        <button onclick="openApp('${app.name}')">Open</button>
+      </div>
+    `;
+  });
+}
+
+/* FAVORITES */
+function toggleFav(name) {
+  if (fav.includes(name)) {
+    fav = fav.filter(f => f !== name);
+  } else {
+    fav.push(name);
+  }
+  localStorage.setItem("fav", JSON.stringify(fav));
+  loadApps();
+  loadFav();
+}
+
+function loadFav() {
+  const container = document.getElementById("fav");
+  container.innerHTML = "";
+
+  apps.filter(a => fav.includes(a.name)).forEach(app => {
+    container.innerHTML += `
+      <div class="card">
+        <img src="${app.img}">
+        <p>${app.name}</p>
+      </div>
+    `;
+  });
+}
+
+/* RECENT */
+function openApp(name) {
+  const app = apps.find(a => a.name === name);
+  const q = document.getElementById("search").value;
+
+  window.open(app.url + q, "_blank");
+
+  recent.unshift(name);
+  localStorage.setItem("recent", JSON.stringify(recent.slice(0,5)));
+  loadRecent();
+}
+
+function loadRecent() {
+  const container = document.getElementById("recent");
+  container.innerHTML = "";
+
+  apps.filter(a => recent.includes(a.name)).forEach(app => {
+    container.innerHTML += `
+      <div class="card">
+        <img src="${app.img}">
+        <p>${app.name}</p>
+      </div>
+    `;
+  });
+}
+
+/* SEARCH PRODUCTS (API) */
+async function search() {
   const q = document.getElementById("search").value;
   if (!q) return;
 
   const res = await fetch("https://dummyjson.com/products/search?q=" + q);
   const data = await res.json();
 
-  products = data.products;
-
-  renderProducts();
-  renderCompare();
-}
-
-/* PRODUCT CARDS */
-function renderProducts() {
   const container = document.getElementById("results");
   container.innerHTML = "";
 
-  products.forEach(p => {
+  data.products.forEach(p => {
     container.innerHTML += `
-      <div class="card" onclick="openProduct('${p.title}')">
-        <img src="${p.thumbnail}">
-        <p>${p.title}</p>
-        <div class="price">₹${p.price}</div>
-      </div>
-    `;
-  });
-}
-
-/* COMPARE VIEW */
-function renderCompare() {
-  const c = document.getElementById("compareList");
-  c.innerHTML = "";
-
-  products.forEach(p => {
-    c.innerHTML += `
       <div class="card">
         <img src="${p.thumbnail}">
         <p>${p.title}</p>
-
-        <div class="price">Amazon: ₹${p.price}</div>
-        <div class="price">Flipkart: ₹${p.price + 100}</div>
-        <div class="price">Myntra: ₹${p.price + 200}</div>
+        <p>₹${p.price}</p>
       </div>
     `;
   });
-}
-
-/* OPEN PRODUCT */
-function openProduct(name) {
-  window.open("https://www.google.com/search?q=" + name, "_blank");
-
-  recent.unshift(name);
-  localStorage.setItem("recent", JSON.stringify(recent.slice(0,5)));
 }
 
 /* NAVIGATION */
@@ -193,6 +255,12 @@ function showPage(id, el) {
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   el.classList.add("active");
 }
+
+/* INIT */
+loadApps();
+loadFav();
+loadRecent();
+
 </script>
 
 </body>
