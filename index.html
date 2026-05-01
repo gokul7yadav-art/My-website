@@ -15,13 +15,10 @@ body {
 
 /* HEADER */
 .header {
-  position: sticky;
-  top: 0;
   padding: 15px;
+  text-align: center;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(10px);
-  text-align: center;
-  z-index: 100;
 }
 
 .header h1 {
@@ -29,32 +26,35 @@ body {
   color: #4fd1ff;
 }
 
-/* SEARCH */
+/* SEARCH FIXED */
 .search-box {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 15px;
 }
 
-input {
+.search-box input {
   flex: 1;
+  min-width: 0;
   padding: 12px;
   border-radius: 25px;
   border: none;
 }
 
-select {
+.search-box select {
   padding: 12px;
   border-radius: 25px;
   border: none;
+  max-width: 110px;
 }
 
-button.go {
-  padding: 12px 18px;
+.search-box button {
+  padding: 12px;
   border-radius: 25px;
   border: none;
   background: #4fd1ff;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 /* CATEGORY */
@@ -63,6 +63,7 @@ button.go {
   justify-content: center;
   gap: 10px;
   padding: 10px;
+  flex-wrap: wrap;
 }
 
 .categories button {
@@ -71,7 +72,6 @@ button.go {
   border: none;
   background: #1f2a38;
   color: white;
-  transition: 0.3s;
 }
 
 .categories button.active {
@@ -85,9 +85,9 @@ button.go {
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   padding: 20px;
-  padding-bottom: 100px;
 }
 
+/* CARDS */
 .card {
   padding: 25px;
   border-radius: 18px;
@@ -98,40 +98,22 @@ button.go {
 }
 
 .card:hover {
-  transform: translateY(-5px) scale(1.03);
+  transform: translateY(-5px);
   background: rgba(79,209,255,0.2);
 }
 
-/* BOTTOM NAV */
-.navbar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(10px);
-  padding: 10px 0;
-}
-
-.navbar div {
-  color: #4fd1ff;
-  font-size: 14px;
-}
-
-/* ANIMATION */
-.card {
-  animation: fadeUp 0.6s ease;
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+/* MOBILE FIX */
+@media (max-width: 480px) {
+  .search-box {
+    flex-wrap: nowrap;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .search-box select {
+    max-width: 90px;
+  }
+
+  .search-box button {
+    padding: 10px;
   }
 }
 </style>
@@ -146,7 +128,7 @@ button.go {
 <div class="search-box">
   <input type="text" id="searchInput" placeholder="Search products...">
   <select id="platformSelect"></select>
-  <button class="go" onclick="searchProduct()">Go</button>
+  <button onclick="searchProduct()">Go</button>
 </div>
 
 <div class="categories">
@@ -157,13 +139,6 @@ button.go {
 </div>
 
 <div class="grid" id="storeGrid"></div>
-
-<!-- Bottom Navigation -->
-<div class="navbar">
-  <div>🏠 Home</div>
-  <div>🔍 Search</div>
-  <div>🛍 Categories</div>
-</div>
 
 <script>
 const platforms = {
@@ -230,7 +205,7 @@ function searchProduct() {
   }
 }
 
-/* Initial */
+/* INIT */
 updateDropdown("all");
 updateGrid("all");
 </script>
