@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:system-ui;
   background:linear-gradient(#06121f,#000814);
   color:white;
 }
@@ -53,10 +55,9 @@ body{
 /* CATEGORY */
 .categories{
   display:flex;
-  justify-content:center;
   gap:10px;
   padding:10px;
-  flex-wrap:wrap;
+  overflow-x:auto;
 }
 
 .categories button{
@@ -65,6 +66,7 @@ body{
   border:none;
   background:#1b2736;
   color:white;
+  white-space:nowrap;
 }
 
 .categories .active{
@@ -89,6 +91,12 @@ body{
   justify-content:center;
   align-items:center;
   position:relative;
+  animation:fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1;}
 }
 
 .card:active{
@@ -111,11 +119,23 @@ body{
   cursor:pointer;
 }
 
-/* RESULTS */
+/* RESULTS SCREEN */
 #results{
   display:none;
   padding:20px;
   text-align:center;
+}
+
+/* INSTALL BUTTON */
+.install-btn{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#4fd1ff;
+  padding:10px 20px;
+  border-radius:20px;
+  display:none;
 }
 </style>
 </head>
@@ -135,21 +155,21 @@ body{
   <button onclick="setCategory('fashion',this)">Fashion</button>
   <button onclick="setCategory('electronics',this)">Electronics</button>
   <button onclick="setCategory('beauty',this)">Beauty</button>
+  <button onclick="showFavorites()">⭐ Favorites</button>
 </div>
 
 <div id="grid" class="grid"></div>
 
-<!-- RESULT SCREEN -->
 <div id="results">
   <button onclick="goHome()">⬅ Back</button>
   <h2 id="resultTitle"></h2>
   <p id="resultDesc"></p>
-
-  <button onclick="openSearch()" 
-  style="margin-top:15px; padding:12px 20px; border-radius:20px; border:none; background:#4fd1ff; font-weight:bold;">
-  Open Results 🚀
+  <button onclick="openSearch()" style="margin-top:15px;padding:12px 20px;border-radius:20px;border:none;background:#4fd1ff;">
+    Open Results 🚀
   </button>
 </div>
+
+<button class="install-btn" id="installBtn">Install App 📱</button>
 
 <script>
 const platforms={
@@ -177,39 +197,28 @@ const logos={
   Nykaa:"nykaa.png"
 };
 
-/* FAVORITES */
 let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
 
 function toggleFav(name,star,e){
   e.stopPropagation();
-
   if(favorites.includes(name)){
     favorites = favorites.filter(f=>f!==name);
-    star.innerText="☆";
   }else{
     favorites.push(name);
-    star.innerText="⭐";
   }
-
   localStorage.setItem("favApps",JSON.stringify(favorites));
+  updateGrid("all");
 }
 
-/* GRID */
 function updateGrid(cat){
   const g=document.getElementById("grid");
   g.innerHTML="";
-
   platforms[cat].forEach(p=>{
     const card=document.createElement("div");
     card.className="card";
 
     const img=document.createElement("img");
     img.src=logos[p];
-
-    img.onerror=()=>{
-      img.remove();
-      card.innerText=p;
-    };
 
     const star=document.createElement("div");
     star.className="star";
@@ -219,15 +228,28 @@ function updateGrid(cat){
     card.appendChild(star);
     card.appendChild(img);
 
-    card.onclick=()=>{
-      window.open(links[p],"_blank");
-    };
+    card.onclick=()=>window.open(links[p],"_blank");
+    g.appendChild(card);
+  });
+}
+
+function showFavorites(){
+  const g=document.getElementById("grid");
+  g.innerHTML="";
+  favorites.forEach(p=>{
+    const card=document.createElement("div");
+    card.className="card";
+
+    const img=document.createElement("img");
+    img.src=logos[p];
+
+    card.appendChild(img);
+    card.onclick=()=>window.open(links[p],"_blank");
 
     g.appendChild(card);
   });
 }
 
-/* DROPDOWN */
 function updateDropdown(cat){
   const d=document.getElementById("platformSelect");
   d.innerHTML="";
@@ -239,22 +261,17 @@ function updateDropdown(cat){
   });
 }
 
-/* CATEGORY */
 function setCategory(cat,btn){
   document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
-
   updateDropdown(cat);
   updateGrid(cat);
 }
 
-/* SEARCH */
 let currentURL="";
-
 function search(){
   const q=document.getElementById("searchInput").value.trim();
   const p=document.getElementById("platformSelect").value;
-
   if(!q) return;
 
   currentURL = links[p] + encodeURIComponent(q);
@@ -266,12 +283,10 @@ function search(){
   document.getElementById("resultDesc").innerText="Platform: " + p;
 }
 
-/* OPEN */
 function openSearch(){
   window.open(currentURL,"_blank");
 }
 
-/* BACK */
 function goHome(){
   document.getElementById("grid").style.display="grid";
   document.getElementById("results").style.display="none";
@@ -280,6 +295,18 @@ function goHome(){
 /* INIT */
 updateDropdown("all");
 updateGrid("all");
+
+/* PWA INSTALL */
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",(e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installBtn").style.display="block";
+});
+
+document.getElementById("installBtn").onclick=()=>{
+  deferredPrompt.prompt();
+};
 </script>
 
 </body>
