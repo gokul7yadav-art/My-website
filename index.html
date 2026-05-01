@@ -8,33 +8,38 @@
 <link rel="manifest" href="manifest.json">
 
 <style>
+:root {
+  --bg1: #000;
+  --bg2: #001f3f;
+  --card: #1e2a38;
+  --accent: #4cc9f0;
+}
+
 body {
   margin: 0;
-  font-family: Arial;
-  background: linear-gradient(to bottom, #000, #001f3f);
+  font-family: system-ui, Arial;
+  background: linear-gradient(to bottom, var(--bg1), var(--bg2));
   color: white;
 }
 
-/* Header */
+/* HEADER */
 .header {
   text-align: center;
-  padding: 15px;
-  font-size: 24px;
-  font-weight: bold;
+  padding: 16px;
+  font-size: 22px;
+  font-weight: 600;
 }
 
-/* Pages */
+/* PAGE */
 .page {
   min-height: 100vh;
-  padding-bottom: 90px; /* prevents navbar overlap */
+  padding-bottom: 90px;
   display: none;
 }
 
-#home {
-  display: block;
-}
+#home { display: block; }
 
-/* Search */
+/* SEARCH */
 .search-bar {
   display: flex;
   gap: 10px;
@@ -52,22 +57,23 @@ button {
   padding: 12px 18px;
   border-radius: 25px;
   border: none;
-  background: #4cc9f0;
+  background: var(--accent);
   font-weight: bold;
 }
 
-/* Trending */
+/* TRENDING */
 .trending {
   padding: 10px;
+  font-size: 14px;
 }
 
 .trending span {
   margin-right: 10px;
-  color: #4cc9f0;
+  color: var(--accent);
   cursor: pointer;
 }
 
-/* Grid */
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -75,14 +81,13 @@ button {
   padding: 15px;
 }
 
-/* Cards */
+/* CARD */
 .card {
-  background: #1e2a38;
-  border-radius: 15px;
+  background: var(--card);
+  border-radius: 16px;
   padding: 20px;
   text-align: center;
   position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
   transition: 0.2s;
 }
 
@@ -103,12 +108,12 @@ button {
   font-size: 18px;
 }
 
-/* Navbar */
+/* NAVBAR */
 .navbar {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: black;
+  background: #000;
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
@@ -116,13 +121,30 @@ button {
 }
 
 .nav-item {
-  text-align: center;
   color: gray;
+  text-align: center;
   cursor: pointer;
 }
 
 .nav-item.active {
-  color: #4cc9f0;
+  color: var(--accent);
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  padding: 10px 16px;
+  border-radius: 10px;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
 }
 </style>
 </head>
@@ -133,7 +155,6 @@ button {
 
 <!-- HOME -->
 <div id="home" class="page">
-
 <div class="search-bar">
   <input id="search" placeholder="Search products...">
   <select id="platform">
@@ -152,11 +173,9 @@ button {
 <span onclick="quick('shoes')">Shoes</span>
 <span onclick="quick('mobiles')">Mobiles</span>
 <span onclick="quick('watches')">Watches</span>
-<span onclick="quick('headphones')">Headphones</span>
 </div>
 
 <div id="apps" class="grid"></div>
-
 </div>
 
 <!-- FAVORITES -->
@@ -171,19 +190,23 @@ button {
 <div id="recent" class="grid"></div>
 </div>
 
-<!-- NAVBAR -->
+<!-- NAV -->
 <div class="navbar">
   <div class="nav-item active" onclick="showPage('home', this)">🏠<br>Home</div>
   <div class="nav-item" onclick="showPage('favPage', this)">⭐<br>Fav</div>
   <div class="nav-item" onclick="showPage('recentPage', this)">🕒<br>Recent</div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
+/* SERVICE WORKER */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js');
 }
 
-const apps = {
+/* DATA */
+const APPS = {
   amazon: "https://www.amazon.in/s?k=",
   flipkart: "https://www.flipkart.com/search?q=",
   myntra: "https://www.myntra.com/",
@@ -192,52 +215,75 @@ const apps = {
   nykaa: "https://www.nykaa.com/search/result/?q="
 };
 
-let fav = JSON.parse(localStorage.getItem("fav")) || [];
-let recent = JSON.parse(localStorage.getItem("recent")) || [];
+let state = {
+  fav: JSON.parse(localStorage.getItem("fav")) || [],
+  recent: JSON.parse(localStorage.getItem("recent")) || []
+};
 
-function search() {
-  let q = document.getElementById("search").value;
-  let p = document.getElementById("platform").value;
-
-  addRecent(p);
-  window.open(apps[p] + q, "_blank");
+/* UTIL */
+function save() {
+  localStorage.setItem("fav", JSON.stringify(state.fav));
+  localStorage.setItem("recent", JSON.stringify(state.recent));
 }
 
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+/* SEARCH */
+function search() {
+  const q = document.getElementById("search").value.trim();
+  const p = document.getElementById("platform").value;
+  if (!q) return;
+
+  addRecent(p);
+  window.open(APPS[p] + q, "_blank");
+}
+
+/* QUICK */
 function quick(q) {
   document.getElementById("search").value = q;
 }
 
+/* FAVORITE */
 function toggleFav(app, e) {
   e.stopPropagation();
 
-  if (fav.includes(app)) {
-    fav = fav.filter(a => a !== app);
+  if (state.fav.includes(app)) {
+    state.fav = state.fav.filter(a => a !== app);
+    toast("Removed from favorites");
   } else {
-    fav.push(app);
+    state.fav.push(app);
+    toast("Added to favorites");
   }
 
-  localStorage.setItem("fav", JSON.stringify(fav));
+  save();
   render();
 }
 
+/* RECENT */
 function addRecent(app) {
-  recent = [app, ...recent.filter(a => a !== app)].slice(0,5);
-  localStorage.setItem("recent", JSON.stringify(recent));
+  state.recent = [app, ...state.recent.filter(a => a !== app)].slice(0,5);
+  save();
 }
 
+/* CARD */
 function createCard(app) {
-  let div = document.createElement("div");
+  const div = document.createElement("div");
   div.className = "card";
 
   div.innerHTML = `
-    <div class="star">${fav.includes(app) ? "⭐" : "☆"}</div>
+    <div class="star">${state.fav.includes(app) ? "⭐" : "☆"}</div>
     <img src="${app}.png" onerror="this.src='https://via.placeholder.com/70?text=${app}'">
     <p>${app.charAt(0).toUpperCase() + app.slice(1)}</p>
   `;
 
   div.onclick = () => {
     addRecent(app);
-    window.open(apps[app], "_blank");
+    window.open(APPS[app], "_blank");
     render();
   };
 
@@ -246,27 +292,31 @@ function createCard(app) {
   return div;
 }
 
+/* RENDER */
 function render() {
-  document.getElementById("apps").innerHTML = "";
-  document.getElementById("fav").innerHTML = "";
-  document.getElementById("recent").innerHTML = "";
+  const appsEl = document.getElementById("apps");
+  const favEl = document.getElementById("fav");
+  const recentEl = document.getElementById("recent");
 
-  for (let app in apps) {
-    document.getElementById("apps").appendChild(createCard(app));
-  }
+  appsEl.innerHTML = "";
+  favEl.innerHTML = "";
+  recentEl.innerHTML = "";
 
-  fav.forEach(a => document.getElementById("fav").appendChild(createCard(a)));
-  recent.forEach(a => document.getElementById("recent").appendChild(createCard(a)));
+  Object.keys(APPS).forEach(a => appsEl.appendChild(createCard(a)));
+  state.fav.forEach(a => favEl.appendChild(createCard(a)));
+  state.recent.forEach(a => recentEl.appendChild(createCard(a)));
 }
 
-function showPage(page, el) {
+/* NAV */
+function showPage(id, el) {
   document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-  document.getElementById(page).style.display = "block";
+  document.getElementById(id).style.display = "block";
 
   document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
   el.classList.add("active");
 }
 
+/* INIT */
 render();
 </script>
 
