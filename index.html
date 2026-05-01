@@ -5,120 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#000814;
-  color:white;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(#000, #001f3f);
+  color: white;
 }
 
-/* HEADER */
-.header{
-  padding:16px;
-  font-size:22px;
-  font-weight:700;
-  text-align:center;
-  background:#000;
+.header {
+  text-align: center;
+  padding: 15px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* SCREENS */
-.screen{ display:none; padding-bottom:70px; }
-.active{ display:block; }
-
-/* SEARCH */
-.search-box{
-  display:flex;
-  gap:8px;
-  padding:12px;
-}
-.search-box input{
-  flex:1;
-  padding:12px;
-  border-radius:25px;
-  border:none;
-}
-.search-box select{
-  padding:12px;
-  border-radius:25px;
-  border:none;
-}
-.search-box button{
-  padding:12px;
-  border-radius:25px;
-  border:none;
-  background:#4fd1ff;
+.search-bar {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
 }
 
-/* CATEGORY */
-.categories{
-  display:flex;
-  gap:10px;
-  padding:10px;
-  overflow-x:auto;
-}
-.categories button{
-  padding:10px 16px;
-  border-radius:20px;
-  border:none;
-  background:#1e293b;
-  color:white;
-}
-.categories .active-btn{
-  background:#4fd1ff;
-  color:black;
+input, select {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  width: 100%;
 }
 
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:12px;
+button {
+  padding: 12px 18px;
+  border-radius: 25px;
+  border: none;
+  background: #4cc9f0;
+  font-weight: bold;
 }
 
-/* CARD */
-.card{
-  height:120px;
-  border-radius:18px;
-  background:#1e293b;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-}
-.card img{ width:80px; }
-.card:active{ transform:scale(0.95); }
-
-/* STAR */
-.star{
-  position:absolute;
-  top:8px;
-  right:10px;
+.trending {
+  padding: 10px;
+  font-size: 14px;
 }
 
-/* NAV */
-.nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#000;
-  display:flex;
-  justify-content:space-around;
-  padding:10px 0;
-  border-top:1px solid #222;
+.trending span {
+  margin-right: 10px;
+  cursor: pointer;
+  color: #4cc9f0;
 }
-.nav div{
-  text-align:center;
-  font-size:12px;
-  cursor:pointer;
-  opacity:0.7;
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
 }
-.nav .active-nav{
-  color:#4fd1ff;
-  opacity:1;
+
+.card {
+  background: #1e2a38;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.card img {
+  width: 80px;
+}
+
+.star {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.section-title {
+  padding: 10px;
+  font-size: 18px;
 }
 </style>
 </head>
@@ -127,190 +89,129 @@ body{
 
 <div class="header">🛒 Shopping Hub</div>
 
-<!-- HOME -->
-<div id="home" class="screen active">
-  <div class="search-box">
-    <input id="searchInput" placeholder="Search products...">
-    <select id="platformSelect"></select>
-    <button onclick="search()">Go</button>
-  </div>
-
-  <div class="categories">
-    <button onclick="setCategory('all',this)" class="active-btn">All</button>
-    <button onclick="setCategory('fashion',this)">Fashion</button>
-    <button onclick="setCategory('electronics',this)">Electronics</button>
-    <button onclick="setCategory('beauty',this)">Beauty</button>
-  </div>
-
-  <div id="grid" class="grid"></div>
+<div class="search-bar">
+  <input id="search" placeholder="Search products...">
+  <select id="platform">
+    <option value="amazon">Amazon</option>
+    <option value="flipkart">Flipkart</option>
+    <option value="myntra">Myntra</option>
+    <option value="ajio">Ajio</option>
+    <option value="tatacliq">TataCliq</option>
+    <option value="nykaa">Nykaa</option>
+  </select>
+  <button onclick="search()">Go</button>
 </div>
 
-<!-- FAVORITES -->
-<div id="favorites" class="screen">
-  <h3 style="padding:10px;">⭐ Favorites</h3>
-  <div id="favGrid" class="grid"></div>
+<div class="trending">
+🔥 Trending:
+<span onclick="quick('shoes')">Shoes</span>
+<span onclick="quick('mobiles')">Mobiles</span>
+<span onclick="quick('watches')">Watches</span>
+<span onclick="quick('headphones')">Headphones</span>
 </div>
 
-<!-- RECENT -->
-<div id="recent" class="screen">
-  <h3 style="padding:10px;">🕘 Recently Visited</h3>
-  <div id="recentGrid" class="grid"></div>
-</div>
+<button onclick="searchAll()" style="margin:10px">🔍 Search in all apps</button>
 
-<!-- NAV -->
-<div class="nav">
-  <div onclick="showScreen('home',this)" class="active-nav">🏠<br>Home</div>
-  <div onclick="showScreen('favorites',this)">⭐<br>Fav</div>
-  <div onclick="showScreen('recent',this)">🕘<br>Recent</div>
-</div>
+<div class="section-title">⭐ Favorites</div>
+<div id="fav" class="grid"></div>
+
+<div class="section-title">🕒 Recently Visited</div>
+<div id="recent" class="grid"></div>
+
+<div class="section-title">🛍 All Apps</div>
+<div id="apps" class="grid"></div>
 
 <script>
-const platforms={
-  all:["Amazon","Flipkart","Myntra","Ajio","Tata Cliq","Nykaa"],
-  fashion:["Myntra","Ajio","Tata Cliq"],
-  electronics:["Amazon","Flipkart"],
-  beauty:["Nykaa"]
+const apps = {
+  amazon: "https://www.amazon.in/s?k=",
+  flipkart: "https://www.flipkart.com/search?q=",
+  myntra: "https://www.myntra.com/",
+  ajio: "https://www.ajio.com/search/?text=",
+  tatacliq: "https://www.tatacliq.com/search/?searchCategory=all&text=",
+  nykaa: "https://www.nykaa.com/search/result/?q="
 };
 
-const links={
-  Amazon:"https://www.amazon.in/s?k=",
-  Flipkart:"https://www.flipkart.com/search?q=",
-  Myntra:"https://www.myntra.com/",
-  Ajio:"https://www.ajio.com/search/?text=",
-  "Tata Cliq":"https://www.tatacliq.com/search/?text=",
-  Nykaa:"https://www.nykaa.com/search/result/?q="
+const affiliate = {
+  amazon: "&tag=yourid"
 };
 
-const logos={
-  Amazon:"amazon.png",
-  Flipkart:"flipkart.png",
-  Myntra:"myntra.png",
-  Ajio:"ajio.png",
-  "Tata Cliq":"tatacliq.png",
-  Nykaa:"nykaa.png"
-};
+let fav = JSON.parse(localStorage.getItem("fav")) || [];
+let recent = JSON.parse(localStorage.getItem("recent")) || [];
 
-let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
-let recent = JSON.parse(localStorage.getItem("recentApps")) || [];
-
-function openApp(name){
-  window.open(links[name],"_blank");
-
-  // update recent
-  recent = [name, ...recent.filter(r=>r!==name)].slice(0,6);
-  localStorage.setItem("recentApps",JSON.stringify(recent));
-  updateRecent();
+function search() {
+  let q = document.getElementById("search").value;
+  let p = document.getElementById("platform").value;
+  let url = apps[p] + q + (affiliate[p] || "");
+  addRecent(p);
+  window.open(url);
 }
 
-function toggleFav(name,e){
-  e.stopPropagation();
-  if(favorites.includes(name)){
-    favorites = favorites.filter(f=>f!==name);
-  }else{
-    favorites.push(name);
+function searchAll() {
+  let q = document.getElementById("search").value;
+  for (let key in apps) {
+    window.open(apps[key] + q);
   }
-  localStorage.setItem("favApps",JSON.stringify(favorites));
-  updateGrid("all");
-  updateFav();
 }
 
-function updateGrid(cat){
-  const g=document.getElementById("grid");
-  g.innerHTML="";
-  platforms[cat].forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
+function quick(q) {
+  document.getElementById("search").value = q;
+}
 
-    const img=document.createElement("img");
-    img.src=logos[p];
+function toggleFav(app) {
+  if (fav.includes(app)) {
+    fav = fav.filter(a => a !== app);
+  } else {
+    fav.push(app);
+  }
+  localStorage.setItem("fav", JSON.stringify(fav));
+  render();
+}
 
-    const star=document.createElement("div");
-    star.className="star";
-    star.innerText = favorites.includes(p) ? "⭐" : "☆";
-    star.onclick=(e)=>toggleFav(p,e);
+function addRecent(app) {
+  recent = [app, ...recent.filter(a => a !== app)].slice(0,5);
+  localStorage.setItem("recent", JSON.stringify(recent));
+  render();
+}
 
-    card.appendChild(star);
-    card.appendChild(img);
+function createCard(app) {
+  let div = document.createElement("div");
+  div.className = "card";
 
-    card.onclick=()=>openApp(p);
+  div.innerHTML = `
+    <div class="star" onclick="toggleFav('${app}')">
+      ${fav.includes(app) ? "⭐" : "☆"}
+    </div>
+    <img src="${app}.png">
+    <p>${app}</p>
+  `;
 
-    g.appendChild(card);
+  div.onclick = () => {
+    addRecent(app);
+    window.open(apps[app]);
+  };
+
+  return div;
+}
+
+function render() {
+  document.getElementById("apps").innerHTML = "";
+  document.getElementById("fav").innerHTML = "";
+  document.getElementById("recent").innerHTML = "";
+
+  for (let app in apps) {
+    document.getElementById("apps").appendChild(createCard(app));
+  }
+
+  fav.forEach(a => {
+    document.getElementById("fav").appendChild(createCard(a));
+  });
+
+  recent.forEach(a => {
+    document.getElementById("recent").appendChild(createCard(a));
   });
 }
 
-function updateFav(){
-  const g=document.getElementById("favGrid");
-  g.innerHTML="";
-  favorites.forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const img=document.createElement("img");
-    img.src=logos[p];
-    card.appendChild(img);
-    card.onclick=()=>openApp(p);
-    g.appendChild(card);
-  });
-}
-
-function updateRecent(){
-  const g=document.getElementById("recentGrid");
-  g.innerHTML="";
-  recent.forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const img=document.createElement("img");
-    img.src=logos[p];
-    card.appendChild(img);
-    card.onclick=()=>openApp(p);
-    g.appendChild(card);
-  });
-}
-
-function updateDropdown(cat){
-  const d=document.getElementById("platformSelect");
-  d.innerHTML="";
-  platforms[cat].forEach(p=>{
-    const o=document.createElement("option");
-    o.value=p;
-    o.textContent=p;
-    d.appendChild(o);
-  });
-}
-
-function setCategory(cat,btn){
-  document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active-btn"));
-  btn.classList.add("active-btn");
-  updateDropdown(cat);
-  updateGrid(cat);
-}
-
-function search(){
-  const q=encodeURIComponent(document.getElementById("searchInput").value.trim());
-  const p=document.getElementById("platformSelect").value;
-  if(!q) return;
-
-  openApp(p);
-  window.open(links[p]+q,"_blank");
-}
-
-function showScreen(id,el){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-
-  document.querySelectorAll(".nav div").forEach(n=>n.classList.remove("active-nav"));
-  el.classList.add("active-nav");
-}
-
-/* INIT */
-updateDropdown("all");
-updateGrid("all");
-updateFav();
-updateRecent();
-
-/* SERVICE WORKER */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+render();
 </script>
 
 </body>
