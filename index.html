@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   background:linear-gradient(#06121f,#000814);
   color:white;
 }
@@ -89,7 +89,6 @@ body{
   justify-content:center;
   align-items:center;
   position:relative;
-  transition:0.2s;
 }
 
 .card:active{
@@ -111,6 +110,13 @@ body{
   font-size:20px;
   cursor:pointer;
 }
+
+/* RESULTS */
+#results{
+  display:none;
+  padding:20px;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -131,7 +137,19 @@ body{
   <button onclick="setCategory('beauty',this)">Beauty</button>
 </div>
 
-<div class="grid" id="grid"></div>
+<div id="grid" class="grid"></div>
+
+<!-- RESULT SCREEN -->
+<div id="results">
+  <button onclick="goHome()">⬅ Back</button>
+  <h2 id="resultTitle"></h2>
+  <p id="resultDesc"></p>
+
+  <button onclick="openSearch()" 
+  style="margin-top:15px; padding:12px 20px; border-radius:20px; border:none; background:#4fd1ff; font-weight:bold;">
+  Open Results 🚀
+  </button>
+</div>
 
 <script>
 const platforms={
@@ -145,9 +163,9 @@ const links={
   Amazon:"https://www.amazon.in/s?k=",
   Flipkart:"https://www.flipkart.com/search?q=",
   Myntra:"https://www.myntra.com/",
-  Ajio:"https://www.ajio.com/",
-  "Tata Cliq":"https://www.tatacliq.com/",
-  Nykaa:"https://www.nykaa.com/"
+  Ajio:"https://www.ajio.com/search/?text=",
+  "Tata Cliq":"https://www.tatacliq.com/search/?text=",
+  Nykaa:"https://www.nykaa.com/search/result/?q="
 };
 
 const logos={
@@ -159,22 +177,9 @@ const logos={
   Nykaa:"nykaa.png"
 };
 
-/* FAVORITES STORAGE */
+/* FAVORITES */
 let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
 
-/* UPDATE DROPDOWN */
-function updateDropdown(cat){
-  const d=document.getElementById("platformSelect");
-  d.innerHTML="";
-  platforms[cat].forEach(p=>{
-    const o=document.createElement("option");
-    o.value=p;
-    o.textContent=p;
-    d.appendChild(o);
-  });
-}
-
-/* TOGGLE FAVORITE */
 function toggleFav(name,star,e){
   e.stopPropagation();
 
@@ -189,7 +194,7 @@ function toggleFav(name,star,e){
   localStorage.setItem("favApps",JSON.stringify(favorites));
 }
 
-/* UPDATE GRID */
+/* GRID */
 function updateGrid(cat){
   const g=document.getElementById("grid");
   g.innerHTML="";
@@ -206,11 +211,9 @@ function updateGrid(cat){
       card.innerText=p;
     };
 
-    /* STAR */
     const star=document.createElement("div");
     star.className="star";
     star.innerText = favorites.includes(p) ? "⭐" : "☆";
-
     star.onclick=(e)=>toggleFav(p,star,e);
 
     card.appendChild(star);
@@ -224,6 +227,18 @@ function updateGrid(cat){
   });
 }
 
+/* DROPDOWN */
+function updateDropdown(cat){
+  const d=document.getElementById("platformSelect");
+  d.innerHTML="";
+  platforms[cat].forEach(p=>{
+    const o=document.createElement("option");
+    o.value=p;
+    o.textContent=p;
+    d.appendChild(o);
+  });
+}
+
 /* CATEGORY */
 function setCategory(cat,btn){
   document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
@@ -234,17 +249,32 @@ function setCategory(cat,btn){
 }
 
 /* SEARCH */
+let currentURL="";
+
 function search(){
-  const q=document.getElementById("searchInput").value;
+  const q=document.getElementById("searchInput").value.trim();
   const p=document.getElementById("platformSelect").value;
 
   if(!q) return;
 
-  if(p==="Amazon"||p==="Flipkart"){
-    window.open(links[p]+q,"_blank");
-  }else{
-    window.open(links[p],"_blank");
-  }
+  currentURL = links[p] + encodeURIComponent(q);
+
+  document.getElementById("grid").style.display="none";
+  document.getElementById("results").style.display="block";
+
+  document.getElementById("resultTitle").innerText="Searching: " + q;
+  document.getElementById("resultDesc").innerText="Platform: " + p;
+}
+
+/* OPEN */
+function openSearch(){
+  window.open(currentURL,"_blank");
+}
+
+/* BACK */
+function goHome(){
+  document.getElementById("grid").style.display="grid";
+  document.getElementById("results").style.display="none";
 }
 
 /* INIT */
