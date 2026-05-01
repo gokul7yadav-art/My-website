@@ -88,6 +88,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
+  position:relative;
   transition:0.2s;
 }
 
@@ -100,6 +101,15 @@ body{
   width:80px;
   height:50px;
   object-fit:contain;
+}
+
+/* STAR */
+.star{
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:20px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -115,7 +125,7 @@ body{
 </div>
 
 <div class="categories">
-  <button onclick="setCategory('all',this)">All</button>
+  <button onclick="setCategory('all',this)" class="active">All</button>
   <button onclick="setCategory('fashion',this)">Fashion</button>
   <button onclick="setCategory('electronics',this)">Electronics</button>
   <button onclick="setCategory('beauty',this)">Beauty</button>
@@ -140,7 +150,6 @@ const links={
   Nykaa:"https://www.nykaa.com/"
 };
 
-/* LOGO PATHS */
 const logos={
   Amazon:"amazon.png",
   Flipkart:"flipkart.png",
@@ -149,6 +158,9 @@ const logos={
   "Tata Cliq":"tatacliq.png",
   Nykaa:"nykaa.png"
 };
+
+/* FAVORITES STORAGE */
+let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
 
 /* UPDATE DROPDOWN */
 function updateDropdown(cat){
@@ -160,6 +172,21 @@ function updateDropdown(cat){
     o.textContent=p;
     d.appendChild(o);
   });
+}
+
+/* TOGGLE FAVORITE */
+function toggleFav(name,star,e){
+  e.stopPropagation();
+
+  if(favorites.includes(name)){
+    favorites = favorites.filter(f=>f!==name);
+    star.innerText="☆";
+  }else{
+    favorites.push(name);
+    star.innerText="⭐";
+  }
+
+  localStorage.setItem("favApps",JSON.stringify(favorites));
 }
 
 /* UPDATE GRID */
@@ -174,12 +201,19 @@ function updateGrid(cat){
     const img=document.createElement("img");
     img.src=logos[p];
 
-    /* fallback if logo missing */
     img.onerror=()=>{
       img.remove();
       card.innerText=p;
     };
 
+    /* STAR */
+    const star=document.createElement("div");
+    star.className="star";
+    star.innerText = favorites.includes(p) ? "⭐" : "☆";
+
+    star.onclick=(e)=>toggleFav(p,star,e);
+
+    card.appendChild(star);
     card.appendChild(img);
 
     card.onclick=()=>{
@@ -190,7 +224,7 @@ function updateGrid(cat){
   });
 }
 
-/* CATEGORY SELECT */
+/* CATEGORY */
 function setCategory(cat,btn){
   document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
