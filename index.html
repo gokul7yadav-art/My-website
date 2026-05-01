@@ -103,7 +103,6 @@ body{
   transform:scale(0.95);
 }
 
-/* LOGO */
 .card img{
   width:80px;
   height:50px;
@@ -117,25 +116,6 @@ body{
   right:10px;
   font-size:20px;
   cursor:pointer;
-}
-
-/* RESULTS SCREEN */
-#results{
-  display:none;
-  padding:20px;
-  text-align:center;
-}
-
-/* INSTALL BUTTON */
-.install-btn{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#4fd1ff;
-  padding:10px 20px;
-  border-radius:20px;
-  display:none;
 }
 </style>
 </head>
@@ -155,21 +135,9 @@ body{
   <button onclick="setCategory('fashion',this)">Fashion</button>
   <button onclick="setCategory('electronics',this)">Electronics</button>
   <button onclick="setCategory('beauty',this)">Beauty</button>
-  <button onclick="showFavorites()">⭐ Favorites</button>
 </div>
 
 <div id="grid" class="grid"></div>
-
-<div id="results">
-  <button onclick="goHome()">⬅ Back</button>
-  <h2 id="resultTitle"></h2>
-  <p id="resultDesc"></p>
-  <button onclick="openSearch()" style="margin-top:15px;padding:12px 20px;border-radius:20px;border:none;background:#4fd1ff;">
-    Open Results 🚀
-  </button>
-</div>
-
-<button class="install-btn" id="installBtn">Install App 📱</button>
 
 <script>
 const platforms={
@@ -199,7 +167,7 @@ const logos={
 
 let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
 
-function toggleFav(name,star,e){
+function toggleFav(name,e){
   e.stopPropagation();
   if(favorites.includes(name)){
     favorites = favorites.filter(f=>f!==name);
@@ -223,27 +191,11 @@ function updateGrid(cat){
     const star=document.createElement("div");
     star.className="star";
     star.innerText = favorites.includes(p) ? "⭐" : "☆";
-    star.onclick=(e)=>toggleFav(p,star,e);
+    star.onclick=(e)=>toggleFav(p,e);
 
     card.appendChild(star);
     card.appendChild(img);
 
-    card.onclick=()=>window.open(links[p],"_blank");
-    g.appendChild(card);
-  });
-}
-
-function showFavorites(){
-  const g=document.getElementById("grid");
-  g.innerHTML="";
-  favorites.forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
-
-    const img=document.createElement("img");
-    img.src=logos[p];
-
-    card.appendChild(img);
     card.onclick=()=>window.open(links[p],"_blank");
 
     g.appendChild(card);
@@ -270,43 +222,22 @@ function setCategory(cat,btn){
 
 let currentURL="";
 function search(){
-  const q=document.getElementById("searchInput").value.trim();
+  const q=encodeURIComponent(document.getElementById("searchInput").value.trim());
   const p=document.getElementById("platformSelect").value;
   if(!q) return;
 
-  currentURL = links[p] + encodeURIComponent(q);
-
-  document.getElementById("grid").style.display="none";
-  document.getElementById("results").style.display="block";
-
-  document.getElementById("resultTitle").innerText="Searching: " + q;
-  document.getElementById("resultDesc").innerText="Platform: " + p;
-}
-
-function openSearch(){
+  currentURL = links[p] + q;
   window.open(currentURL,"_blank");
-}
-
-function goHome(){
-  document.getElementById("grid").style.display="grid";
-  document.getElementById("results").style.display="none";
 }
 
 /* INIT */
 updateDropdown("all");
 updateGrid("all");
 
-/* PWA INSTALL */
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt",(e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById("installBtn").style.display="block";
-});
-
-document.getElementById("installBtn").onclick=()=>{
-  deferredPrompt.prompt();
-};
+/* ✅ SERVICE WORKER (ADDED HERE CORRECTLY) */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
 </script>
 
 </body>
