@@ -13,6 +13,7 @@ body {
   color: white;
 }
 
+/* Header */
 .header {
   text-align: center;
   padding: 15px;
@@ -20,6 +21,7 @@ body {
   font-weight: bold;
 }
 
+/* Search */
 .search-bar {
   display: flex;
   gap: 10px;
@@ -41,6 +43,7 @@ button {
   font-weight: bold;
 }
 
+/* Trending */
 .trending {
   padding: 10px;
   font-size: 14px;
@@ -52,6 +55,7 @@ button {
   color: #4cc9f0;
 }
 
+/* Grid */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -59,6 +63,7 @@ button {
   padding: 15px;
 }
 
+/* Cards */
 .card {
   background: #1e2a38;
   border-radius: 15px;
@@ -80,12 +85,27 @@ button {
   top: 10px;
   right: 10px;
   font-size: 18px;
-  cursor: pointer;
 }
 
-.section-title {
-  padding: 10px;
-  font-size: 18px;
+/* Bottom Nav */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: black;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.nav-item {
+  text-align: center;
+  cursor: pointer;
+  color: gray;
+}
+
+.nav-item.active {
+  color: #4cc9f0;
 }
 </style>
 </head>
@@ -93,6 +113,8 @@ button {
 <body>
 
 <div class="header">🛒 Shopping Hub</div>
+
+<div id="home">
 
 <div class="search-bar">
   <input id="search" placeholder="Search products...">
@@ -115,14 +137,26 @@ button {
 <span onclick="quick('headphones')">Headphones</span>
 </div>
 
-<div class="section-title">⭐ Favorites</div>
-<div id="fav" class="grid"></div>
-
-<div class="section-title">🕒 Recently Visited</div>
-<div id="recent" class="grid"></div>
-
-<div class="section-title">🛍 All Apps</div>
 <div id="apps" class="grid"></div>
+
+</div>
+
+<div id="favPage" style="display:none">
+  <h2 style="padding:10px">⭐ Favorites</h2>
+  <div id="fav" class="grid"></div>
+</div>
+
+<div id="recentPage" style="display:none">
+  <h2 style="padding:10px">🕒 Recently Visited</h2>
+  <div id="recent" class="grid"></div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="navbar">
+  <div class="nav-item active" onclick="showPage('home', this)">🏠<br>Home</div>
+  <div class="nav-item" onclick="showPage('favPage', this)">⭐<br>Fav</div>
+  <div class="nav-item" onclick="showPage('recentPage', this)">🕒<br>Recent</div>
+</div>
 
 <script>
 const apps = {
@@ -130,7 +164,7 @@ const apps = {
   flipkart: "https://www.flipkart.com/search?q=",
   myntra: "https://www.myntra.com/",
   ajio: "https://www.ajio.com/search/?text=",
-  tatacliq: "https://www.tatacliq.com/search/?searchCategory=all&text=",
+  tatacliq: "https://www.tatacliq.com/search/?text=",
   nykaa: "https://www.nykaa.com/search/result/?q="
 };
 
@@ -149,7 +183,7 @@ function quick(q) {
 }
 
 function toggleFav(app, e) {
-  e.stopPropagation(); // prevent card click
+  e.stopPropagation();
 
   if (fav.includes(app)) {
     fav = fav.filter(a => a !== app);
@@ -173,18 +207,16 @@ function createCard(app) {
   div.innerHTML = `
     <div class="star">${fav.includes(app) ? "⭐" : "☆"}</div>
     <img src="${app}.png"
-         onerror="this.onerror=null; this.src='https://via.placeholder.com/70?text=${app}'">
+         onerror="this.src='https://via.placeholder.com/70?text=${app}'">
     <p>${app.charAt(0).toUpperCase() + app.slice(1)}</p>
   `;
 
-  // Card click
   div.onclick = () => {
     addRecent(app);
     window.open(apps[app], "_blank");
     render();
   };
 
-  // Star click
   div.querySelector(".star").onclick = (e) => toggleFav(app, e);
 
   return div;
@@ -195,20 +227,28 @@ function render() {
   document.getElementById("fav").innerHTML = "";
   document.getElementById("recent").innerHTML = "";
 
-  // All apps
   for (let app in apps) {
     document.getElementById("apps").appendChild(createCard(app));
   }
 
-  // Favorites
   fav.forEach(a => {
     document.getElementById("fav").appendChild(createCard(a));
   });
 
-  // Recent
   recent.forEach(a => {
     document.getElementById("recent").appendChild(createCard(a));
   });
+}
+
+function showPage(page, el) {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("favPage").style.display = "none";
+  document.getElementById("recentPage").style.display = "none";
+
+  document.getElementById(page).style.display = "block";
+
+  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+  el.classList.add("active");
 }
 
 render();
