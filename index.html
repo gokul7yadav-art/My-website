@@ -5,129 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shopping Hub</title>
 
-<style>
-:root{
-  --accent:#4fd1ff;
-  --bg1:#06121f;
-  --bg2:#000814;
-}
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4fd1ff">
 
+<style>
 body{
   margin:0;
-  font-family:'Segoe UI',system-ui,Arial,sans-serif;
-  color:#e8f3ff;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  font-family:Arial;
+  color:white;
+  background:linear-gradient(#06121f,#000814);
 }
 
-/* HEADER */
 .header{
-  padding:16px;
+  padding:15px;
   text-align:center;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(10px);
-}
-.header h1{
-  margin:0;
-  color:var(--accent);
+  background:#000;
 }
 
-/* SEARCH */
 .search-box{
   display:flex;
-  gap:8px;
-  padding:14px;
-}
-.search-box input{
-  flex:1;
-  min-width:0;
-  padding:12px;
-  border-radius:999px;
-  border:none;
-  outline:none;
-}
-.search-box select{
-  padding:12px;
-  border-radius:999px;
-  border:none;
-  max-width:110px;
-}
-.search-box button{
-  padding:12px 14px;
-  border-radius:999px;
-  border:none;
-  background:var(--accent);
-  font-weight:700;
+  gap:6px;
+  padding:10px;
 }
 
-/* CATEGORY */
+input, select, button{
+  padding:10px;
+  border-radius:20px;
+  border:none;
+}
+
+input{flex:1;}
+
 .categories{
   display:flex;
-  flex-wrap:wrap;
   justify-content:center;
   gap:10px;
-  padding:6px 10px;
-}
-.categories button{
-  padding:8px 14px;
-  border-radius:999px;
-  border:none;
-  background:#1b2736;
-  color:#cfe6ff;
-}
-.categories button.active{
-  background:var(--accent);
-  color:#001018;
+  flex-wrap:wrap;
 }
 
-/* GRID */
+.categories button{
+  background:#1b2736;
+  color:white;
+}
+
+.categories .active{
+  background:#4fd1ff;
+  color:black;
+}
+
 .grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-  padding:16px;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
 }
 
-/* CARD */
 .card{
-  position:relative;
-  height:110px;
-  border-radius:18px;
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(12px);
+  height:100px;
+  background:#1b2736;
+  border-radius:15px;
   display:flex;
   justify-content:center;
   align-items:center;
-  overflow:hidden;
-  transition:.2s;
-}
-.card:active{
-  transform:scale(.95);
-}
-.card:hover{
-  background:rgba(79,209,255,.18);
+  position:relative;
 }
 
-/* LOGO */
 .card img{
-  max-width:90px;
-  max-height:45px;
-  object-fit:contain;
-  filter:brightness(1.2);
+  max-width:70px;
 }
 
-/* RIPPLE */
-.ripple{
+.fav{
   position:absolute;
-  border-radius:50%;
-  background:rgba(255,255,255,.4);
-  transform:scale(0);
-  animation:ripple .5s linear;
+  top:5px;
+  right:8px;
 }
-@keyframes ripple{
-  to{
-    transform:scale(4);
-    opacity:0;
-  }
+
+#installBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  padding:10px;
+  background:#4fd1ff;
+  border-radius:10px;
+  display:none;
 }
 </style>
 </head>
@@ -135,33 +95,35 @@ body{
 <body>
 
 <div class="header">
-  <h1>🛒 Shopping Hub</h1>
+  <h2>🛒 Shopping Hub</h2>
 </div>
 
 <div class="search-box">
-  <input id="searchInput" placeholder="Search products...">
+  <input id="searchInput" placeholder="Search...">
   <select id="platformSelect"></select>
-  <button onclick="searchProduct()">Go</button>
+  <button onclick="search()">Go</button>
 </div>
 
 <div class="categories">
-  <button class="active" onclick="setCategory('all', this)">All</button>
-  <button onclick="setCategory('fashion', this)">Fashion</button>
-  <button onclick="setCategory('electronics', this)">Electronics</button>
-  <button onclick="setCategory('beauty', this)">Beauty</button>
+  <button onclick="setCat('all',this)">All</button>
+  <button onclick="setCat('fashion',this)">Fashion</button>
+  <button onclick="setCat('electronics',this)">Electronics</button>
+  <button onclick="setCat('beauty',this)">Beauty</button>
 </div>
 
-<div class="grid" id="storeGrid"></div>
+<div class="grid" id="grid"></div>
+
+<button id="installBtn">Install</button>
 
 <script>
-const platforms = {
+const platforms={
   all:["Amazon","Flipkart","Myntra","Ajio","Tata Cliq","Nykaa"],
   fashion:["Myntra","Ajio","Tata Cliq"],
   electronics:["Amazon","Flipkart"],
   beauty:["Nykaa"]
 };
 
-const links = {
+const links={
   Amazon:"https://www.amazon.in/s?k=",
   Flipkart:"https://www.flipkart.com/search?q=",
   Myntra:"https://www.myntra.com/",
@@ -170,20 +132,19 @@ const links = {
   Nykaa:"https://www.nykaa.com/"
 };
 
-/* ✅ WORKING LOGOS */
-const logos = {
-  Amazon:"https://cdn.worldvectorlogo.com/logos/amazon-dark.svg",
-  Flipkart:"https://cdn.worldvectorlogo.com/logos/flipkart.svg",
-  Myntra:"https://cdn.worldvectorlogo.com/logos/myntra-1.svg",
-  Ajio:"https://cdn.worldvectorlogo.com/logos/ajio-1.svg",
-  "Tata Cliq":"https://cdn.worldvectorlogo.com/logos/tata-cliq.svg",
-  Nykaa:"https://cdn.worldvectorlogo.com/logos/nykaa-1.svg"
+const logos={
+  Amazon:"amazon.png",
+  Flipkart:"flipkart.png",
+  Myntra:"myntra.png",
+  Ajio:"ajio.png",
+  "Tata Cliq":"tatacliq.png",
+  Nykaa:"nykaa.png"
 };
 
-function updateDropdown(category){
-  const d=document.getElementById("platformSelect");
+function updateDropdown(cat){
+  let d=document.getElementById("platformSelect");
   d.innerHTML="";
-  platforms[category].forEach(p=>{
+  platforms[cat].forEach(p=>{
     let o=document.createElement("option");
     o.value=p;
     o.textContent=p;
@@ -191,68 +152,85 @@ function updateDropdown(category){
   });
 }
 
-function updateGrid(category){
-  const grid=document.getElementById("storeGrid");
-  grid.innerHTML="";
+function updateGrid(cat){
+  let g=document.getElementById("grid");
+  g.innerHTML="";
 
-  platforms[category].forEach(p=>{
-    const card=document.createElement("div");
+  platforms[cat].forEach(p=>{
+    let card=document.createElement("div");
     card.className="card";
 
-    const img=document.createElement("img");
+    let img=document.createElement("img");
     img.src=logos[p];
-    img.alt=p;
 
-    /* fallback */
     img.onerror=()=>{
       img.remove();
-      const text=document.createElement("span");
-      text.textContent=p;
-      text.style.fontWeight="600";
-      card.appendChild(text);
+      card.innerText=p;
+    };
+
+    let fav=document.createElement("div");
+    fav.className="fav";
+    fav.innerText="⭐";
+
+    fav.onclick=(e)=>{
+      e.stopPropagation();
+      let f=JSON.parse(localStorage.getItem("fav"))||[];
+      if(!f.includes(p)) f.push(p);
+      localStorage.setItem("fav",JSON.stringify(f));
     };
 
     card.appendChild(img);
+    card.appendChild(fav);
 
-    card.onclick=(e)=>{
-      const ripple=document.createElement("span");
-      ripple.className="ripple";
-      ripple.style.left=e.offsetX+"px";
-      ripple.style.top=e.offsetY+"px";
-      card.appendChild(ripple);
-      setTimeout(()=>ripple.remove(),500);
+    card.onclick=()=>window.open(links[p],"_blank");
 
-      window.open(links[p],"_blank");
-    };
-
-    grid.appendChild(card);
+    g.appendChild(card);
   });
 }
 
-function setCategory(category,btn){
-  document.querySelectorAll(".categories button")
-    .forEach(b=>b.classList.remove("active"));
+function setCat(cat,btn){
+  localStorage.setItem("cat",cat);
+  document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
 
-  updateDropdown(category);
-  updateGrid(category);
+  updateDropdown(cat);
+  updateGrid(cat);
 }
 
-function searchProduct(){
-  const q=document.getElementById("searchInput").value.trim();
-  const p=document.getElementById("platformSelect").value;
+function search(){
+  let q=document.getElementById("searchInput").value;
+  let p=document.getElementById("platformSelect").value;
+
   if(!q) return;
 
   if(p==="Amazon"||p==="Flipkart"){
-    window.open(links[p]+encodeURIComponent(q),"_blank");
+    window.open(links[p]+q,"_blank");
   }else{
     window.open(links[p],"_blank");
   }
 }
 
 /* INIT */
-updateDropdown("all");
-updateGrid("all");
+let last=localStorage.getItem("cat")||"all";
+updateDropdown(last);
+updateGrid(last);
+
+/* INSTALL */
+let deferred;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferred=e;
+  installBtn.style.display="block";
+});
+
+installBtn.onclick=()=>{
+  deferred.prompt();
+};
+
+/* SW */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 
 </body>
