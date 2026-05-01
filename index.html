@@ -1,6 +1,173 @@
-<script>
-let currentCategory = "all";
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial;
+      color: white;
+      background: linear-gradient(135deg,#020617,#0f172a);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #38bdf8;
+    }
+
+    /* SEARCH */
+    .search-box {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+      gap: 5px;
+    }
+
+    input {
+      width: 50%;
+      padding: 12px;
+      border-radius: 25px;
+      border: none;
+      outline: none;
+    }
+
+    select {
+      padding: 12px;
+      border-radius: 25px;
+      border: none;
+    }
+
+    button {
+      padding: 12px 15px;
+      border: none;
+      background: #38bdf8;
+      color: black;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: #1e293b;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #38bdf8;
+      color: black;
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.05);
+      text-decoration: none;
+      color: white;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #38bdf8;
+    }
+
+    .hidden { display: none; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #020617;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #1e293b;
+    }
+
+    .bottom-nav div {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .bottom-nav div.active {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🛒 Shopping Hub</h1>
+
+<!-- SEARCH -->
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search products...">
+
+  <!-- 🔥 dynamic dropdown -->
+  <select id="platform"></select>
+
+  <button onclick="search()">Go</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showCategory('all',this)">All</div>
+  <div class="tab" onclick="showCategory('fashion',this)">Fashion</div>
+  <div class="tab" onclick="showCategory('electronics',this)">Electronics</div>
+  <div class="tab" onclick="showCategory('beauty',this)">Beauty</div>
+</div>
+
+<!-- GRID -->
+<div class="grid">
+
+  <a class="card all electronics" href="https://www.amazon.in" target="_blank">Amazon</a>
+  <a class="card all electronics" href="https://www.flipkart.com" target="_blank">Flipkart</a>
+
+  <a class="card all fashion" href="https://www.myntra.com" target="_blank">Myntra</a>
+  <a class="card all fashion" href="https://www.ajio.com" target="_blank">Ajio</a>
+  <a class="card all fashion" href="https://www.tatacliq.com" target="_blank">Tata Cliq</a>
+
+  <a class="card all beauty" href="https://www.nykaa.com" target="_blank">Nykaa</a>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="active">🏠 Home</div>
+  <div onclick="scrollToTop()">🔍 Search</div>
+  <div onclick="scrollToTop()">🛍 Categories</div>
+</div>
+
+<script>
 const platforms = {
   all: [
     {name:"Amazon", url:"https://www.amazon.in/s?k="},
@@ -42,8 +209,6 @@ function search() {
 }
 
 function showCategory(category, el) {
-  currentCategory = category;
-
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
 
@@ -55,13 +220,17 @@ function showCategory(category, el) {
     }
   });
 
-  updateDropdown(category); // 🔥 THIS IS THE KEY
+  updateDropdown(category);
 }
 
-// initialize
-updateDropdown("all");
+window.onload = function() {
+  updateDropdown("all");
+};
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
+
+</body>
+</html>
