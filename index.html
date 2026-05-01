@@ -6,115 +6,102 @@
 <title>Shopping Hub</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg, #06121f, #000814);
-  color: white;
+:root{
+  --accent:#4fd1ff;
+  --bg1:#06121f;
+  --bg2:#000814;
+}
+
+body{
+  margin:0;
+  font-family:'Segoe UI',system-ui,Arial,sans-serif;
+  color:#e8f3ff;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
 }
 
 /* HEADER */
-.header {
-  padding: 15px;
-  text-align: center;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
+.header{
+  padding:16px;
+  text-align:center;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
 }
+.header h1{ margin:0; color:var(--accent); letter-spacing:.3px; }
 
-.header h1 {
-  margin: 0;
-  color: #4fd1ff;
+/* SEARCH */
+.search-box{
+  display:flex; gap:8px; padding:14px;
 }
-
-/* SEARCH FIXED */
-.search-box {
-  display: flex;
-  gap: 8px;
-  padding: 15px;
+.search-box input{
+  flex:1; min-width:0;
+  padding:12px 14px; border-radius:999px; border:none;
+  outline:none;
 }
-
-.search-box input {
-  flex: 1;
-  min-width: 0;
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
+.search-box select{
+  padding:12px; border-radius:999px; border:none; max-width:110px;
 }
-
-.search-box select {
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  max-width: 110px;
-}
-
-.search-box button {
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  background: #4fd1ff;
-  font-weight: bold;
-  white-space: nowrap;
+.search-box button{
+  padding:12px 14px; border-radius:999px; border:none;
+  background:var(--accent); color:#001018; font-weight:700;
 }
 
 /* CATEGORY */
-.categories {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px;
-  flex-wrap: wrap;
+.categories{
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:10px; padding:8px 12px 4px;
 }
-
-.categories button {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: none;
-  background: #1f2a38;
-  color: white;
+.categories button{
+  padding:8px 16px; border-radius:999px; border:none;
+  background:#1b2736; color:#cfe6ff;
+  transition:.25s;
 }
-
-.categories button.active {
-  background: #4fd1ff;
-  color: black;
+.categories button.active{
+  background:var(--accent); color:#001018;
 }
 
 /* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  padding: 20px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  padding:16px 16px 28px;
 }
 
-/* CARDS */
-.card {
-  padding: 25px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(15px);
-  text-align: center;
-  transition: 0.3s;
+/* CARD */
+.card{
+  position:relative;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(14px);
+  display:flex; align-items:center; justify-content:center;
+  height:110px;
+  overflow:hidden;
+  transition:transform .18s ease, background .18s ease;
+}
+.card:active{ transform:scale(.96); }
+.card:hover{ transform:translateY(-3px); background:rgba(79,209,255,.18); }
+
+/* LOGO */
+.card img{
+  max-width:90px; max-height:46px; object-fit:contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  background: rgba(79,209,255,0.2);
+/* RIPPLE */
+.ripple{
+  position:absolute; border-radius:50%;
+  transform:scale(0);
+  animation:ripple .5s linear;
+  background:rgba(255,255,255,.35);
+}
+@keyframes ripple{
+  to{ transform:scale(4); opacity:0; }
 }
 
-/* MOBILE FIX */
-@media (max-width: 480px) {
-  .search-box {
-    flex-wrap: nowrap;
-  }
-
-  .search-box select {
-    max-width: 90px;
-  }
-
-  .search-box button {
-    padding: 10px;
-  }
+/* MOBILE TUNE */
+@media (max-width:480px){
+  .search-box select{ max-width:90px; }
 }
 </style>
 </head>
@@ -126,7 +113,7 @@ body {
 </div>
 
 <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search products...">
+  <input id="searchInput" placeholder="Search products...">
   <select id="platformSelect"></select>
   <button onclick="searchProduct()">Go</button>
 </div>
@@ -142,70 +129,94 @@ body {
 
 <script>
 const platforms = {
-  all: ["Amazon", "Flipkart", "Myntra", "Ajio", "Tata Cliq", "Nykaa"],
-  fashion: ["Myntra", "Ajio", "Tata Cliq"],
-  electronics: ["Amazon", "Flipkart"],
-  beauty: ["Nykaa"]
+  all:["Amazon","Flipkart","Myntra","Ajio","Tata Cliq","Nykaa"],
+  fashion:["Myntra","Ajio","Tata Cliq"],
+  electronics:["Amazon","Flipkart"],
+  beauty:["Nykaa"]
 };
 
 const links = {
-  Amazon: "https://www.amazon.in/s?k=",
-  Flipkart: "https://www.flipkart.com/search?q=",
-  Myntra: "https://www.myntra.com/",
-  Ajio: "https://www.ajio.com/",
-  "Tata Cliq": "https://www.tatacliq.com/",
-  Nykaa: "https://www.nykaa.com/"
+  Amazon:"https://www.amazon.in/s?k=",
+  Flipkart:"https://www.flipkart.com/search?q=",
+  Myntra:"https://www.myntra.com/",
+  Ajio:"https://www.ajio.com/",
+  "Tata Cliq":"https://www.tatacliq.com/",
+  Nykaa:"https://www.nykaa.com/"
 };
 
-function updateDropdown(category) {
-  const dropdown = document.getElementById("platformSelect");
-  dropdown.innerHTML = "";
+/* 🔥 LOGOS (CDN images) */
+const logos = {
+  Amazon:"https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+  Flipkart:"https://upload.wikimedia.org/wikipedia/commons/1/17/Flipkart_logo.png",
+  Myntra:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Myntra_logo.png",
+  Ajio:"https://upload.wikimedia.org/wikipedia/commons/2/22/Ajio-Logo.png",
+  "Tata Cliq":"https://upload.wikimedia.org/wikipedia/commons/0/0b/Tata_CLiQ_logo.png",
+  Nykaa:"https://upload.wikimedia.org/wikipedia/commons/0/0f/Nykaa_Logo.png"
+};
 
-  platforms[category].forEach(p => {
-    let option = document.createElement("option");
-    option.value = p;
-    option.textContent = p;
-    dropdown.appendChild(option);
+function updateDropdown(category){
+  const d=document.getElementById("platformSelect");
+  d.innerHTML="";
+  platforms[category].forEach(p=>{
+    let o=document.createElement("option");
+    o.value=p; o.textContent=p;
+    d.appendChild(o);
   });
 }
 
-function updateGrid(category) {
-  const grid = document.getElementById("storeGrid");
-  grid.innerHTML = "";
+function updateGrid(category){
+  const grid=document.getElementById("storeGrid");
+  grid.innerHTML="";
 
-  platforms[category].forEach(p => {
-    let div = document.createElement("div");
-    div.className = "card";
-    div.innerText = p;
-    div.onclick = () => window.open(links[p], "_blank");
-    grid.appendChild(div);
+  platforms[category].forEach(p=>{
+    const card=document.createElement("div");
+    card.className="card";
+
+    /* logo */
+    const img=document.createElement("img");
+    img.src=logos[p];
+    img.alt=p;
+
+    card.appendChild(img);
+
+    /* click + ripple */
+    card.onclick=(e)=>{
+      const ripple=document.createElement("span");
+      ripple.className="ripple";
+      ripple.style.left=e.offsetX+"px";
+      ripple.style.top=e.offsetY+"px";
+      card.appendChild(ripple);
+      setTimeout(()=>ripple.remove(),500);
+
+      window.open(links[p],"_blank");
+    };
+
+    grid.appendChild(card);
   });
 }
 
-function setCategory(category, btn) {
-  document.querySelectorAll(".categories button").forEach(b => b.classList.remove("active"));
+function setCategory(category,btn){
+  document.querySelectorAll(".categories button")
+    .forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
 
   updateDropdown(category);
   updateGrid(category);
 }
 
-function searchProduct() {
-  const query = document.getElementById("searchInput").value;
-  const platform = document.getElementById("platformSelect").value;
+function searchProduct(){
+  const q=document.getElementById("searchInput").value.trim();
+  const p=document.getElementById("platformSelect").value;
+  if(!q) return;
 
-  if (!query) return;
-
-  let url = links[platform];
-
-  if (platform === "Amazon" || platform === "Flipkart") {
-    window.open(url + encodeURIComponent(query), "_blank");
-  } else {
-    window.open(url, "_blank");
+  if(p==="Amazon"||p==="Flipkart"){
+    window.open(links[p]+encodeURIComponent(q),"_blank");
+  }else{
+    window.open(links[p],"_blank");
   }
 }
 
-/* INIT */
+/* init */
 updateDropdown("all");
 updateGrid("all");
 </script>
