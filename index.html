@@ -25,14 +25,8 @@ body{
 }
 
 /* SCREENS */
-.screen{
-  display:none;
-  padding-bottom:70px;
-}
-
-.active{
-  display:block;
-}
+.screen{ display:none; padding-bottom:70px; }
+.active{ display:block; }
 
 /* SEARCH */
 .search-box{
@@ -40,20 +34,17 @@ body{
   gap:8px;
   padding:12px;
 }
-
 .search-box input{
   flex:1;
   padding:12px;
   border-radius:25px;
   border:none;
 }
-
 .search-box select{
   padding:12px;
   border-radius:25px;
   border:none;
 }
-
 .search-box button{
   padding:12px;
   border-radius:25px;
@@ -68,7 +59,6 @@ body{
   padding:10px;
   overflow-x:auto;
 }
-
 .categories button{
   padding:10px 16px;
   border-radius:20px;
@@ -76,7 +66,6 @@ body{
   background:#1e293b;
   color:white;
 }
-
 .categories .active-btn{
   background:#4fd1ff;
   color:black;
@@ -100,24 +89,17 @@ body{
   align-items:center;
   position:relative;
 }
-
-.card img{
-  width:80px;
-}
-
-.card:active{
-  transform:scale(0.95);
-}
+.card img{ width:80px; }
+.card:active{ transform:scale(0.95); }
 
 /* STAR */
 .star{
   position:absolute;
   top:8px;
   right:10px;
-  font-size:18px;
 }
 
-/* BOTTOM NAV */
+/* NAV */
 .nav{
   position:fixed;
   bottom:0;
@@ -128,14 +110,12 @@ body{
   padding:10px 0;
   border-top:1px solid #222;
 }
-
 .nav div{
   text-align:center;
   font-size:12px;
   cursor:pointer;
   opacity:0.7;
 }
-
 .nav .active-nav{
   color:#4fd1ff;
   opacity:1;
@@ -171,17 +151,17 @@ body{
   <div id="favGrid" class="grid"></div>
 </div>
 
-<!-- SEARCH SCREEN -->
-<div id="searchScreen" class="screen">
-  <h3 style="padding:10px;">🔍 Search</h3>
-  <p style="padding:10px;">Use search from home</p>
+<!-- RECENT -->
+<div id="recent" class="screen">
+  <h3 style="padding:10px;">🕘 Recently Visited</h3>
+  <div id="recentGrid" class="grid"></div>
 </div>
 
 <!-- NAV -->
 <div class="nav">
   <div onclick="showScreen('home',this)" class="active-nav">🏠<br>Home</div>
   <div onclick="showScreen('favorites',this)">⭐<br>Fav</div>
-  <div onclick="showScreen('searchScreen',this)">🔍<br>Search</div>
+  <div onclick="showScreen('recent',this)">🕘<br>Recent</div>
 </div>
 
 <script>
@@ -211,6 +191,16 @@ const logos={
 };
 
 let favorites = JSON.parse(localStorage.getItem("favApps")) || [];
+let recent = JSON.parse(localStorage.getItem("recentApps")) || [];
+
+function openApp(name){
+  window.open(links[name],"_blank");
+
+  // update recent
+  recent = [name, ...recent.filter(r=>r!==name)].slice(0,6);
+  localStorage.setItem("recentApps",JSON.stringify(recent));
+  updateRecent();
+}
 
 function toggleFav(name,e){
   e.stopPropagation();
@@ -242,7 +232,7 @@ function updateGrid(cat){
     card.appendChild(star);
     card.appendChild(img);
 
-    card.onclick=()=>window.open(links[p],"_blank");
+    card.onclick=()=>openApp(p);
 
     g.appendChild(card);
   });
@@ -254,13 +244,24 @@ function updateFav(){
   favorites.forEach(p=>{
     const card=document.createElement("div");
     card.className="card";
-
     const img=document.createElement("img");
     img.src=logos[p];
-
     card.appendChild(img);
-    card.onclick=()=>window.open(links[p],"_blank");
+    card.onclick=()=>openApp(p);
+    g.appendChild(card);
+  });
+}
 
+function updateRecent(){
+  const g=document.getElementById("recentGrid");
+  g.innerHTML="";
+  recent.forEach(p=>{
+    const card=document.createElement("div");
+    card.className="card";
+    const img=document.createElement("img");
+    img.src=logos[p];
+    card.appendChild(img);
+    card.onclick=()=>openApp(p);
     g.appendChild(card);
   });
 }
@@ -287,10 +288,11 @@ function search(){
   const q=encodeURIComponent(document.getElementById("searchInput").value.trim());
   const p=document.getElementById("platformSelect").value;
   if(!q) return;
+
+  openApp(p);
   window.open(links[p]+q,"_blank");
 }
 
-/* NAVIGATION */
 function showScreen(id,el){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -303,6 +305,7 @@ function showScreen(id,el){
 updateDropdown("all");
 updateGrid("all");
 updateFav();
+updateRecent();
 
 /* SERVICE WORKER */
 if ('serviceWorker' in navigator) {
